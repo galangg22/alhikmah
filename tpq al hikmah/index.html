@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPQ AL HIKMAH - Pendidikan Private</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'amiri': ['Amiri', 'serif'],
+                    },
+                    colors: {
+                        'primary': '#2e8b57',
+                        'secondary': '#20b2aa',
+                        'accent': '#ffd700',
+                        'success': '#228b22',
+                        'danger': '#ff6b6b',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 2s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'slide-down': 'slideDown 0.4s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                transform: translateY(0);
+            }
+        }
+        
+        .bg-islamic-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='star' x='0' y='0' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='10' cy='10' r='1' fill='white' opacity='0.3'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23star)'/%3E%3C/svg%3E");
+        }
+        
+        .backdrop-blur-custom {
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+        
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+        
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+            opacity: 0;
+        }
+        
+        .expandable-content.expanded {
+            max-height: 500px;
+            opacity: 1;
+        }
+        
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body class="font-poppins text-gray-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    
+    <!-- Header -->
+    <header id="header" class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-custom shadow-xl transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-quran-book text-2xl text-accent animate-pulse-slow"></i>
+                    <h2 class="text-2xl font-bold font-amiri text-primary hover:text-secondary transition-colors duration-300 cursor-pointer">
+                        TPQ AL HIKMAH
+                    </h2>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <ul class="hidden md:flex space-x-8">
+                    <li><a href="#home" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Beranda
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                    <li><a href="#about" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Tentang
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                    <li><a href="#classes" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Kelas
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                    <li><a href="#programs" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Program
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                    <li><a href="#testimonial" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Testimoni
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                    <li><a href="#contact" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Kontak
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a></li>
+                </ul>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-primary text-2xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50">
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h3 class="font-bold text-primary font-amiri">Menu</h3>
+                    <button id="close-mobile-menu" class="text-gray-500 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <ul class="p-6 space-y-4">
+                    <li><a href="#home" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Beranda</a></li>
+                    <li><a href="#about" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Tentang</a></li>
+                    <li><a href="#classes" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kelas</a></li>
+                    <li><a href="#programs" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Program</a></li>
+                    <li><a href="#testimonial" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Testimoni</a></li>
+                    <li><a href="#contact" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kontak</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen bg-gradient-to-br from-primary via-success to-green-800 text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-islamic-pattern animate-float opacity-30"></div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 min-h-screen flex items-center justify-center text-center px-6">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-5xl md:text-7xl font-bold font-amiri mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent animate-pulse tracking-wide">
+                    TPQ AL HIKMAH
+                </h1>
+                <p class="text-xl md:text-2xl mb-10 opacity-95 max-w-3xl mx-auto leading-relaxed">
+                    Membangun Generasi Qurani dengan Pendidikan Terbaik Sejak 2008
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-accent to-yellow-400 text-primary px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-accent/50 min-w-[200px]">
+                        <i class="fas fa-user mr-2"></i>
+                        Kelas Privat
+                    </button>
+                    <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-secondary to-teal-400 text-white px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-secondary/50 min-w-[200px]">
+                        <i class="fas fa-users mr-2"></i>
+                        Kelas Offline
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Cdefs%3E%3Cpattern id=\'dots\' x=\'0\' y=\'0\' width=\'15\' height=\'15\' patternUnits=\'userSpaceOnUse\'%3E%3Ccircle cx=\'7.5\' cy=\'7.5\' r=\'0.8\' fill=\'%232e8b57\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100\' height=\'100\' fill=\'url(%23dots)\'/%3E%3C/svg%3E')"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold font-amiri text-primary mb-4 relative inline-block">
+                    TENTANG KAMI
+                    <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+                </h2>
+            </div>
+
+            <!-- Main Story -->
+            <div class="mb-16">
+                <div class="max-w-4xl mx-auto text-center">
+                    <p class="text-xl leading-relaxed text-gray-700 bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-primary/10">
+                        Taman Pendidikan Qur'an Al Hikmah berdiri sejak tahun 2008, didirikan oleh 
+                        <span class="font-semibold text-primary">Abah Haji Nur Mukhid</span> dan 
+                        <span class="font-semibold text-primary">Ibu Asmaul Khusnah</span> dengan visi mulia 
+                        membentuk generasi yang cinta Al-Qur'an dan berakhlak karimah.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold font-amiri text-primary text-center mb-12">Perjalanan Kami</h3>
+                
+                <div class="relative max-w-4xl mx-auto">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-primary via-secondary to-primary rounded-full hidden md:block"></div>
+                    
+                    <!-- Timeline Items -->
+                    <div class="space-y-12">
+                        <!-- 2008 -->
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/2 md:pr-8 mb-4 md:mb-0 text-center md:text-right">
+                                <div class="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                                    <h4 class="text-xl font-bold text-primary mb-3 flex items-center justify-center md:justify-end">
+                                        <i class="fas fa-star mr-2"></i>
+                                        Awal Berdiri
+                                    </h4>
+                                    <p class="text-gray-600 leading-relaxed">
+                                        TPQ Al Hikmah didirikan di Jalan Kemiri, Sidoarjo oleh Abah Haji Nur Mukhid dan Ibu Asmaul Khusnah dengan semangat dakwah dan pendidikan Qur'ani.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="relative z-10">
+                                <div class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-full font-bold text-lg shadow-xl">
+                                    2008
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 md:pl-8"></div>
+                        </div>
+
+                        <!-- 2012 -->
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/2 md:pr-8"></div>
+                            <div class="relative z-10">
+                                <div class="bg-gradient-to-r from-secondary to-teal-400 text-white px-6 py-3 rounded-full font-bold text-lg shadow-xl">
+                                    2012
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0 text-center md:text-left">
+                                <div class="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                                    <h4 class="text-xl font-bold text-primary mb-3 flex items-center justify-center md:justify-start">
+                                        <i class="fas fa-building mr-2"></i>
+                                        Pembangunan Gedung Al Hikmah
+                                    </h4>
+                                    <p class="text-gray-600 leading-relaxed">
+                                        Melihat pesatnya pertumbuhan jumlah santri, dibangunlah Gedung Al Hikmah yang berada di samping kediaman Abah Haji Nur Mukhid untuk menampung lebih banyak santri.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2015 -->
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/2 md:pr-8 mb-4 md:mb-0 text-center md:text-right">
+                                <div class="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                                    <h4 class="text-xl font-bold text-primary mb-3 flex items-center justify-center md:justify-end">
+                                        <i class="fas fa-graduation-cap mr-2"></i>
+                                        Program Tahfidz & Madrasah Diniyah
+                                    </h4>
+                                    <p class="text-gray-600 leading-relaxed">
+                                        TPQ Al Hikmah resmi membuka program lanjutan bagi anak-anak yang sudah khatam Al-Qur'an, yaitu program Tahfidz dan Madrasah Diniyah (belajar kitab).
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="relative z-10">
+                                <div class="bg-gradient-to-r from-accent to-yellow-400 text-primary px-6 py-3 rounded-full font-bold text-lg shadow-xl">
+                                    2015
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 md:pl-8"></div>
+                        </div>
+
+                        <!-- 2025 -->
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/2 md:pr-8"></div>
+                            <div class="relative z-10">
+                                <div class="bg-gradient-to-r from-primary to-success text-white px-6 py-3 rounded-full font-bold text-lg shadow-xl animate-pulse-slow">
+                                    2025
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0 text-center md:text-left">
+                                <div class="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                                    <h4 class="text-xl font-bold text-primary mb-3 flex items-center justify-center md:justify-start">
+                                        <i class="fas fa-rocket mr-2"></i>
+                                        Ekspansi & Inovasi Program
+                                    </h4>
+                                    <p class="text-gray-600 leading-relaxed">
+                                        Juli 2025: Pembukaan cabang baru di Rungkut Tengah, Surabaya. TPQ Al Hikmah memulai program inovatif berupa 
+                                        <span class="font-semibold text-primary">kelas privat</span> yang memudahkan santri belajar di rumah.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="mb-16">
+                <div class="bg-gradient-to-r from-primary via-secondary to-success p-8 rounded-3xl text-white">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                        <div class="transform hover:scale-110 transition-transform duration-300">
+                            <div class="text-4xl md:text-5xl font-bold text-accent mb-2 animate-bounce-slow">17</div>
+                            <div class="text-sm md:text-base opacity-90 uppercase tracking-wide">Tahun Pengalaman</div>
+                        </div>
+                        <div class="transform hover:scale-110 transition-transform duration-300">
+                            <div class="text-4xl md:text-5xl font-bold text-accent mb-2 animate-bounce-slow">2</div>
+                            <div class="text-sm md:text-base opacity-90 uppercase tracking-wide">Lokasi TPQ</div>
+                        </div>
+                        <div class="transform hover:scale-110 transition-transform duration-300">
+                            <div class="text-4xl md:text-5xl font-bold text-accent mb-2 animate-bounce-slow">500+</div>
+                            <div class="text-sm md:text-base opacity-90 uppercase tracking-wide">Santri Alumni</div>
+                        </div>
+                        <div class="transform hover:scale-110 transition-transform duration-300">
+                            <div class="text-4xl md:text-5xl font-bold text-accent mb-2 animate-bounce-slow">2</div>
+                            <div class="text-sm md:text-base opacity-90 uppercase tracking-wide">Program Kelas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vision Mission -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Vision -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-primary/10">
+                    <div class="text-center">
+                        <div class="text-5xl text-primary mb-6 transform hover:scale-110 hover:rotate-12 transition-all duration-300">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold font-amiri text-primary mb-4 uppercase tracking-wide">Visi Kami</h4>
+                        <p class="text-gray-600 leading-relaxed">
+                            Menjadi lembaga pendidikan Qur'ani terdepan yang mencetak generasi berakhlak mulia, hafal Al-Qur'an, dan paham ajaran Islam.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mission -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-primary/10">
+                    <div class="text-center">
+                        <div class="text-5xl text-primary mb-6 transform hover:scale-110 hover:rotate-12 transition-all duration-300">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold font-amiri text-primary mb-4 uppercase tracking-wide">Misi Kami</h4>
+                        <ul class="text-left space-y-3">
+                            <li class="flex items-start space-x-3 text-gray-600 hover:text-primary transition-colors duration-300">
+                                <span class="text-primary text-lg mt-0.5">✅</span>
+                                <span>Mengajarkan Al-Qur'an dengan metode yang mudah dan menyenangkan</span>
+                            </li>
+                            <li class="flex items-start space-x-3 text-gray-600 hover:text-primary transition-colors duration-300">
+                                <span class="text-primary text-lg mt-0.5">✅</span>
+                                <span>Membentuk karakter Islami sejak dini</span>
+                            </li>
+                            <li class="flex items-start space-x-3 text-gray-600 hover:text-primary transition-colors duration-300">
+                                <span class="text-primary text-lg mt-0.5">✅</span>
+                                <span>Memberikan fleksibilitas pembelajaran sesuai kebutuhan santri</span>
+                            </li>
+                            <li class="flex items-start space-x-3 text-gray-600 hover:text-primary transition-colors duration-300">
+                                <span class="text-primary text-lg mt-0.5">✅</span>
+                                <span>Menyediakan pendidikan berkualitas dengan biaya terjangkau</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Classes Section -->
+    <section id="classes" class="py-20 bg-white relative">
+        <div class="container mx-auto px-6">
+            <!-- Section Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold font-amiri text-primary mb-4 relative inline-block">
+                    PILIHAN KELAS
+                    <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Kelas Privat -->
+                <div class="relative bg-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-4 hover:scale-105 border-2 border-transparent hover:border-primary group">
+                    <!-- Popular Badge -->
+                    <div class="absolute -top-4 right-6 bg-gradient-to-r from-danger to-red-400 text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide animate-pulse-slow">
+                        Populer
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-6xl text-primary mb-6 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold font-amiri text-primary mb-4 uppercase tracking-wide">Kelas Privat</h3>
+                        
+                        <div class="mb-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
+                            <span class="text-4xl font-bold text-primary">Rp 200.000</span>
+                            <span class="text-lg text-gray-600">/bulan</span>
+                        </div>
+                        
+                        <ul class="space-y-4 mb-8 text-left bg-gray-50 p-6 rounded-2xl">
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-primary transition-colors duration-300">
+                                <i class="fas fa-check text-primary text-lg"></i>
+                                <span>Pembelajaran 1-on-1 dengan ustadz</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-primary transition-colors duration-300">
+                                <i class="fas fa-check text-primary text-lg"></i>
+                                <span>Jadwal fleksibel sesuai kebutuhan</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-primary transition-colors duration-300">
+                                <i class="fas fa-check text-primary text-lg"></i>
+                                <span>Metode pembelajaran disesuaikan kemampuan</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-primary transition-colors duration-300">
+                                <i class="fas fa-check text-primary text-lg"></i>
+                                <span>Progress tracking individual</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-primary transition-colors duration-300">
+                                <i class="fas fa-check text-primary text-lg"></i>
+                                <span>Konsultasi orangtua berkala</span>
+                            </li>
+                        </ul>
+                        
+                        <!-- Expandable Content for Privat -->
+                        <div id="privat-extra" class="expandable-content mb-6">
+                            <div class="bg-gradient-to-r from-accent/10 to-yellow-400/10 p-6 rounded-2xl border-l-4 border-accent">
+                                <h4 class="text-lg font-bold text-primary mb-4 flex items-center">
+                                    <i class="fas fa-home mr-2"></i>
+                                    Keunggulan Kelas Privat
+                                </h4>
+                                <ul class="space-y-3 text-left">
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-star text-accent text-sm"></i>
+                                        <span>Santri diberikan kemudahan untuk tidak perlu berangkat ke TPQ</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-clock text-accent text-sm"></i>
+                                        <span>Jam belajar lebih fleksibel sesuai kesepakatan</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-user-friends text-accent text-sm"></i>
+                                        <span>Pembelajaran disesuaikan dengan karakter dan kemampuan anak</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-map-marker-alt text-accent text-sm"></i>
+                                        <span>Lokasi belajar di rumah santri atau di TPQ (pilihan bebas)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <button onclick="toggleDetails('privat')" id="btn-privat" class="w-full bg-gradient-to-r from-accent to-yellow-400 text-primary py-4 px-8 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-accent/50 mb-4">
+                            <span class="btn-text">Lihat Lebih Banyak</span>
+                            <i class="fas fa-chevron-down ml-2 transition-transform duration-300"></i>
+                        </button>
+                        
+                        <button onclick="whatsappContact('privat')" class="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 px-8 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-primary/50">
+                            <i class="fab fa-whatsapp mr-2"></i>
+                            Daftar Kelas Privat
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kelas Offline -->
+                <div class="relative bg-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-4 hover:scale-105 border-2 border-transparent hover:border-secondary group">
+                    <div class="text-center">
+                        <div class="text-6xl text-secondary mb-6 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold font-amiri text-secondary mb-4 uppercase tracking-wide">Kelas Offline</h3>
+                        
+                        <div class="mb-6 p-4 bg-gradient-to-r from-secondary/10 to-teal-400/10 rounded-2xl">
+                            <span class="text-4xl font-bold text-secondary">Rp 100.000</span>
+                            <span class="text-lg text-gray-600">/bulan</span>
+                        </div>
+                        
+                        <ul class="space-y-4 mb-8 text-left bg-gray-50 p-6 rounded-2xl">
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-secondary transition-colors duration-300">
+                                <i class="fas fa-check text-secondary text-lg"></i>
+                                <span>Kelas berkelompok (maks 8 siswa)</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-secondary transition-colors duration-300">
+                                <i class="fas fa-check text-secondary text-lg"></i>
+                                <span>Pembelajaran di lokasi TPQ</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-secondary transition-colors duration-300">
+                                <i class="fas fa-check text-secondary text-lg"></i>
+                                <span>Interaksi sosial dengan sesama santri</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-secondary transition-colors duration-300">
+                                <i class="fas fa-check text-secondary text-lg"></i>
+                                <span>Jadwal tetap dan terstruktur</span>
+                            </li>
+                            <li class="flex items-center space-x-3 text-gray-700 hover:text-secondary transition-colors duration-300">
+                                <i class="fas fa-check text-secondary text-lg"></i>
+                                <span>Kegiatan group learning</span>
+                            </li>
+                        </ul>
+                        
+                        <!-- Expandable Content for Offline -->
+                        <div id="offline-extra" class="expandable-content mb-6">
+                            <div class="bg-gradient-to-r from-secondary/10 to-teal-400/10 p-6 rounded-2xl border-l-4 border-secondary">
+                                <h4 class="text-lg font-bold text-secondary mb-4 flex items-center">
+                                    <i class="fas fa-school mr-2"></i>
+                                    Keunggulan Kelas Offline
+                                </h4>
+                                <ul class="space-y-3 text-left">
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-users text-secondary text-sm"></i>
+                                        <span>Pembelajaran berkelompok yang mendorong interaksi sosial</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-building text-secondary text-sm"></i>
+                                        <span>Fasilitas lengkap di gedung TPQ Al Hikmah</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-calendar-alt text-secondary text-sm"></i>
+                                        <span>Jadwal pembelajaran yang konsisten dan terstruktur</span>
+                                    </li>
+                                    <li class="flex items-center space-x-3 text-gray-700">
+                                        <i class="fas fa-trophy text-secondary text-sm"></i>
+                                        <span>Kompetisi dan kegiatan bersama sesama santri</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <button onclick="toggleDetails('offline')" id="btn-offline" class="w-full bg-gradient-to-r from-secondary to-teal-400 text-white py-4 px-8 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-secondary/50 mb-4">
+                            <span class="btn-text">Lihat Lebih Banyak</span>
+                            <i class="fas fa-chevron-down ml-2 transition-transform duration-300"></i>
+                        </button>
+                        
+                        <button onclick="whatsappContact('offline')" class="w-full bg-gradient-to-r from-success to-green-600 text-white py-4 px-8 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-success/50">
+                            <i class="fab fa-whatsapp mr-2"></i>
+                            Daftar Kelas Offline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
+        <div class="container mx-auto px-6">
+            <!-- Section Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold font-amiri text-primary mb-4 relative inline-block">
+                    PROGRAM PEMBELAJARAN
+                    <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Program 1 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-4 border-t-4 border-primary group">
+                    <div class="text-center">
+                        <div class="text-5xl text-primary mb-6 transform group-hover:scale-110 group-hover:rotate-360 transition-all duration-500">
+                            <i class="fas fa-book-quran"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary mb-4 uppercase tracking-wide">Pembelajaran Al-Qur'an</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Mengajarkan tajwid, hafalan, dan pemahaman Al-Qur'an secara mendalam dan menyenangkan dengan metode yang telah terbukti efektif.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Program 2 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-4 border-t-4 border-accent group">
+                    <div class="text-center">
+                        <div class="text-5xl text-accent mb-6 transform group-hover:scale-110 group-hover:rotate-360 transition-all duration-500">
+                            <i class="fas fa-star-and-crescent"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-accent mb-4 uppercase tracking-wide">Pengembangan Karakter</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Membentukan akhlak mulia dan karakter Islami sebagai fondasi generasi unggul yang berakhlak karimah.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Program 3 -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-4 border-t-4 border-secondary group">
+                    <div class="text-center">
+                        <div class="text-5xl text-secondary mb-6 transform group-hover:scale-110 group-hover:rotate-360 transition-all duration-500">
+                            <i class="fas fa-mosque"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-secondary mb-4 uppercase tracking-wide">Praktik Ibadah</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Mengajarkan tata cara ibadah yang benar sesuai tuntunan Rasulullah SAW dengan praktik langsung.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section id="testimonial" class="py-20 bg-gradient-to-br from-primary via-secondary to-success text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-20">
+            <div class="w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Cdefs%3E%3Cpattern id=\'stars\' x=\'0\' y=\'0\' width=\'20\' height=\'20\' patternUnits=\'userSpaceOnUse\'%3E%3Ccircle cx=\'10\' cy=\'10\' r=\'1\' fill=\'white\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100\' height=\'100\' fill=\'url(%23stars)\'/%3E%3C/svg%3E'); animation: float 12s ease-in-out infinite;"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold font-amiri mb-4 relative inline-block">
+                    TESTIMONI
+                    <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-accent rounded-full"></span>
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Testimonial 1 -->
+                <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
+                    <div class="text-center">
+                        <div class="text-3xl text-accent mb-4">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <blockquote class="text-xl font-amiri italic mb-6 leading-relaxed">
+                            "Kelas privat sangat membantu anak saya yang pemalu. Ustadz sabar dan bisa menyesuaikan dengan karakter anak."
+                        </blockquote>
+                        <p class="font-semibold uppercase tracking-wide">— Ibu Sari, Kelas Privat</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
+                    <div class="text-center">
+                        <div class="text-3xl text-accent mb-4">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <blockquote class="text-xl font-amiri italic mb-6 leading-relaxed">
+                            "Kelas offline membuat anak saya lebih semangat karena bisa belajar bersama teman-teman sebaya."
+                        </blockquote>
+                        <p class="font-semibold uppercase tracking-wide">— Bapak Ahmad, Kelas Offline</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
+        <div class="container mx-auto px-6">
+            <!-- Section Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold font-amiri text-primary mb-4 relative inline-block">
+                    HUBUNGI KAMI
+                    <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+                </h2>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <!-- Address -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center group">
+                    <div class="text-5xl text-primary mb-6 transform group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-primary mb-4 uppercase tracking-wide">Alamat</h4>
+                    <p class="text-gray-600 leading-relaxed">
+                        <span class="font-semibold text-primary">Cabang Sidoarjo:</span><br>
+                        Jl. Kemiri, Sidoarjo<br><br>
+                        <span class="font-semibold text-primary">Cabang Surabaya:</span><br>
+                        Rungkut Tengah, Surabaya
+                    </p>
+                </div>
+
+                <!-- Phone -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center group cursor-pointer" onclick="callPhone()">
+                    <div class="text-5xl text-primary mb-6 transform group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-primary mb-4 uppercase tracking-wide">Telepon</h4>
+                    <p class="text-gray-600 text-lg">+62 21 9876 5432</p>
+                </div>
+
+                <!-- Email -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center group cursor-pointer" onclick="sendEmail()">
+                    <div class="text-5xl text-primary mb-6 transform group-hover:scale-110 transition-all duration-300">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-primary mb-4 uppercase tracking-wide">Email</h4>
+                    <p class="text-gray-600 text-lg">info@tpqalhikmah.com</p>
+                </div>
+            </div>
+
+            <!-- Schedule -->
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Private Schedule -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center">
+                    <div class="text-4xl text-primary mb-4">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-amiri text-primary mb-4 uppercase tracking-wide">Jadwal Kelas Privat</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        <span class="font-semibold text-primary">Fleksibel:</span> Sesuai kesepakatan<br>
+                        <span class="font-semibold text-primary">Durasi:</span> 90 menit per sesi
+                    </p>
+                </div>
+
+                <!-- Offline Schedule -->
+                <div class="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center">
+                    <div class="text-4xl text-secondary mb-4">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <h3 class="text-xl font-bold font-amiri text-secondary mb-4 uppercase tracking-wide">Jadwal Kelas Offline</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        <span class="font-semibold text-secondary">Senin - Jumat:</span> 15:00 - 17:00 WIB<br>
+                        <span class="font-semibold text-secondary">Sabtu - Minggu:</span> 08:00 - 10:00 WIB
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-primary via-secondary to-success text-white py-8 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="w-full h-full animate-float" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Cdefs%3E%3Cpattern id=\'footer-pattern\' x=\'0\' y=\'0\' width=\'40\' height=\'40\' patternUnits=\'userSpaceOnUse\'%3E%3Ccircle cx=\'20\' cy=\'20\' r=\'1.5\' fill=\'white\'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\'100\' height=\'100\' fill=\'url(%23footer-pattern)\'/%3E%3C/svg%3E')"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <p class="text-lg font-medium tracking-wide hover:text-accent transition-colors duration-300">
+                &copy; 2025 TPQ AL HIKMAH. Mendidik dengan Hati, Membentuk dengan Cinta.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <span id="toast-message">Berhasil!</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.add('active');
+        });
+
+        document.getElementById('close-mobile-menu').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.remove('active');
+        });
+
+        // Close mobile menu when clicking on links
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Scroll to Section Function
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Toggle Details Function
+        function toggleDetails(type) {
+            const extraContent = document.getElementById(type + '-extra');
+            const button = document.getElementById('btn-' + type);
+            const buttonText = button.querySelector('.btn-text');
+            const chevron = button.querySelector('.fas');
+            
+            if (extraContent.classList.contains('expanded')) {
+                // Collapse
+                extraContent.classList.remove('expanded');
+                buttonText.textContent = 'Lihat Lebih Banyak';
+                chevron.classList.remove('rotate-180');
+                chevron.classList.remove('fa-chevron-up');
+                chevron.classList.add('fa-chevron-down');
+            } else {
+                // Expand
+                extraContent.classList.add('expanded');
+                buttonText.textContent = 'Lihat Lebih Sedikit';
+                chevron.classList.add('rotate-180');
+                chevron.classList.remove('fa-chevron-down');
+                chevron.classList.add('fa-chevron-up');
+            }
+        }
+
+        // WhatsApp Contact Function
+        function whatsappContact(classType) {
+            let message = '';
+            if (classType === 'privat') {
+                message = `Halo TPQ Al Hikmah, saya tertarik dengan Kelas Privat (Rp 200.000/bulan).
+
+Keunggulan yang menarik bagi saya:
+- Santri tidak perlu berangkat ke TPQ
+- Jam belajar lebih fleksibel
+- Pembelajaran 1-on-1 dengan ustadz
+- Metode disesuaikan kemampuan anak
+
+Mohon informasi lebih lanjut. Terima kasih.`;
+            } else {
+                message = `Halo TPQ Al Hikmah, saya tertarik dengan Kelas Offline (Rp 100.000/bulan).
+
+Saya tertarik dengan:
+- Pembelajaran berkelompok di TPQ
+- Interaksi sosial dengan sesama santri
+- Jadwal terstruktur
+- Fasilitas lengkap
+
+Mohon informasi lebih lanjut. Terima kasih.`;
+            }
+            
+            const phoneNumber = '6281234567890'; // Ganti dengan nomor WhatsApp TPQ
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+            showToast('Mengarahkan ke WhatsApp...');
+        }
+
+        // Phone Call Function
+        function callPhone() {
+            window.open('tel:+622198765432', '_self');
+            showToast('Memanggil nomor telepon...');
+        }
+
+        // Email Function
+        function sendEmail() {
+            const subject = 'Inquiry TPQ Al Hikmah';
+            const body = 'Halo TPQ Al Hikmah, saya ingin mengetahui informasi lebih lanjut mengenai program pembelajaran yang tersedia. Terima kasih.';
+            window.open(`mailto:info@tpqalhikmah.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+            showToast('Membuka aplikasi email...');
+        }
+
+        // Toast Notification Function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Smooth Scrolling for Navigation Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('bg-white/98');
+                header.classList.remove('bg-white/95');
+            } else {
+                header.classList.add('bg-white/95');
+                header.classList.remove('bg-white/98');
+            }
+        });
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+
+</body>
+</html>

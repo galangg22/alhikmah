@@ -1,153 +1,106 @@
-// WhatsApp Contact Function (Updated)
-function whatsappContact(classType) {
-    let message = '';
-    
-    if (classType === 'privat') {
-        message = `Assalamu'alaikum TPQ Al Hikmah,
+async function whatsappContact(classType) {
+  // Helper SweetAlert2 Input (judul dan placeholder dinamis)
+  async function getInput(title, placeholder) {
+    const { value, isConfirmed } = await Swal.fire({
+      title,
+      input: 'text',
+      inputPlaceholder: placeholder,
+      showCancelButton: true,
+      confirmButtonText: 'Lanjut',
+      cancelButtonText: 'Batal',
+      allowOutsideClick: false
+    });
+    if (!isConfirmed) return null;
+    if (!value || value.trim() === '') {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Harus diisi!',
+        text: 'Input tidak boleh kosong.',
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+      });
+      // Ulang input
+      return await getInput(title, placeholder);
+    }
+    return value.trim();
+  }
 
-Saya tertarik dengan Kelas Privat yang ditawarkan.
+  // Proses input nama
+  const parentName = await getInput('Masukkan nama orang tua/wali:', 'Contoh: Bapak Ahmad');
+  if (!parentName) {
+    await Swal.fire('Dibatalkan', 'Pengisian data orang tua dibatalkan.', 'info');
+    return;
+  }
+  const studentName = await getInput('Masukkan nama santri:', 'Contoh: Ananda Malik');
+  if (!studentName) {
+    await Swal.fire('Dibatalkan', 'Pengisian data santri dibatalkan.', 'info');
+    return;
+  }
 
-Keunggulan yang menarik bagi saya:
-✅ Santri tidak perlu berangkat ke TPQ
-✅ Jam belajar lebih fleksibel sesuai kesepakatan
-✅ Pembelajaran 1-on-1 dengan ustadz
-✅ Metode disesuaikan dengan kemampuan anak
-✅ Progress tracking individual
+  // Generate pesan WhatsApp
+  let message = '';
+  if (classType === 'privat') {
+    message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya bermaksud untuk *mendaftarkan santri* pada program berikut:
+
+📘 *Kelas Privat TPQ Al Hikmah*
+
+Berikut data calon peserta:
+1. 👤 Nama Orang Tua: *${parentName}*
+2. 🧒 Nama Santri: *${studentName}*
 
 Mohon informasi lebih lanjut mengenai:
-- Jadwal yang tersedia
+- Jadwal belajar
 - Biaya pendaftaran dan bulanan
 - Proses pendaftaran
-- Lokasi pembelajaran
 
-Terima kasih.
+Terima kasih atas bantuannya.
 Wassalamu'alaikum`;
-    } else if (classType === 'offline') {
-        message = `Assalamu'alaikum TPQ Al Hikmah,
+  } else if (classType === 'offline') {
+    message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Saya tertarik dengan Kelas Offline yang ditawarkan.
+Saya bermaksud untuk *mendaftarkan santri* pada program berikut:
 
-Yang menarik bagi saya:
-✅ Pembelajaran berkelompok di TPQ
-✅ Interaksi sosial dengan sesama santri
-✅ Jadwal terstruktur dan konsisten
-✅ Fasilitas lengkap di gedung TPQ
-✅ Kegiatan group learning
+🏫 *Kelas Offline TPQ Al Hikmah*
+
+Berikut data calon peserta:
+1. 👤 Nama Orang Tua: *${parentName}*
+2. 🧒 Nama Santri: *${studentName}*
 
 Mohon informasi lebih lanjut mengenai:
-- Jadwal kelas yang tersedia
+- Jadwal kelas
 - Biaya pendaftaran dan bulanan
 - Proses pendaftaran
-- Lokasi TPQ
 
-Terima kasih.
+Terima kasih atas bantuannya.
 Wassalamu'alaikum`;
-    } else if (classType === 'location') {
-        message = `Assalamu'alaikum TPQ Al Hikmah,
+  } else if (classType === 'location') {
+    message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Saya ingin mengetahui informasi lebih lanjut tentang lokasi TPQ Al Hikmah.
+Saya, ${parentName}, ingin mengetahui informasi tentang lokasi TPQ.
 
 Pertanyaan saya:
-- Alamat lengkap kedua cabang
+- Alamat lengkap cabang
 - Jadwal operasional
-- Fasilitas yang tersedia
+- Fasilitas
 - Akses transportasi umum
 
 Terima kasih.
 Wassalamu'alaikum`;
-    } else {
-        message = `Assalamu'alaikum TPQ Al Hikmah,
+  } else {
+    message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Saya ingin mengetahui informasi lebih lanjut mengenai:
+Saya, ${parentName}, ingin mengetahui informasi lengkap mengenai program pembelajaran di TPQ untuk santri bernama ${studentName}.
 
-1. Program pembelajaran yang tersedia
-2. Kelas Privat dan Kelas Offline
-3. Biaya pendaftaran dan bulanan
-4. Jadwal pembelajaran
-5. Proses pendaftaran
-6. Lokasi kedua cabang
+Mohon bantuan dan informasinya.
 
-Mohon dapat diberikan informasi lengkapnya.
-
-Terima kasih atas perhatiannya.
+Terima kasih.
 Wassalamu'alaikum`;
-    }
-    
-    const phoneNumber = '6281234567890'; // Ganti dengan nomor WhatsApp TPQ yang sebenarnya
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, '_blank');
-    showToast('Mengarahkan ke WhatsApp...');
-}
+  }
 
-// Phone Call Function
-function callPhone() {
-    const phoneNumber = 'tel:+622198765432'; // Ganti dengan nomor telepon yang sebenarnya
-    window.open(phoneNumber, '_self');
-    showToast('Memanggil nomor telepon...');
-}
-
-// Email Function
-function sendEmail() {
-    const subject = 'Inquiry TPQ Al Hikmah - Informasi Program';
-    const body = `Assalamu'alaikum TPQ Al Hikmah,
-
-Saya ingin mengetahui informasi lebih lanjut mengenai:
-
-1. Program pembelajaran yang tersedia
-2. Kelas Privat dan Kelas Offline
-3. Biaya pendaftaran dan bulanan
-4. Jadwal pembelajaran
-5. Proses pendaftaran
-6. Lokasi kedua cabang (Sidoarjo dan Surabaya)
-
-Mohon dapat diberikan informasi lengkapnya.
-
-Terima kasih atas perhatiannya.
-Wassalamu'alaikum
-
----
-Email ini dikirim melalui website TPQ Al Hikmah`;
-
-    const mailtoUrl = `mailto:info@tpqalhikmah.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoUrl);
-    showToast('Membuka aplikasi email...');
-}
-
-// Toast Notification Function
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
-    
-    // Set message
-    toastMessage.textContent = message;
-    
-    // Set color based on type
-    if (type === 'success') {
-        toast.className = toast.className.replace(/bg-\w+-500/, 'bg-green-500');
-    } else if (type === 'error') {
-        toast.className = toast.className.replace(/bg-\w+-500/, 'bg-red-500');
-    } else if (type === 'info') {
-        toast.className = toast.className.replace(/bg-\w+-500/, 'bg-blue-500');
-    }
-    
-    // Show toast
-    toast.classList.remove('translate-x-full');
-    
-    // Hide toast after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('translate-x-full');
-    }, 3000);
-}
-
-// Form validation (if needed for future forms)
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-function validatePhone(phone) {
-    const re = /^[\+]?[1-9][\d]{0,15}$/;
-    return re.test(phone);
+  const phoneNumber = '6281252596062';
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  window.location.href = whatsappUrl;
 }

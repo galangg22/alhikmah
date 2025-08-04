@@ -16,12 +16,18 @@
     
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMaps&libraries=places"></script>
+
+    <!-- Tambahkan di <head> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     
     <!-- External JavaScript Files -->
     <script defer src="js/main.js"></script>
     <script defer src="js/contact.js"></script>
     <script defer src="js/animations.js"></script>
     <script defer src="js/maps.js"></script>
+    <script defer src="js/gallery.js"></script>
+
     
     <!-- Tailwind Config -->
     <script>
@@ -90,14 +96,30 @@
             -webkit-backdrop-filter: blur(15px);
         }
         
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .mobile-menu.active {
-            transform: translateX(0);
-        }
+        #mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 80vw;          /* Agar lebih lebar dan nyaman di HP, maksimal 300px */
+  max-width: 300px;
+  background-color: #fff;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  z-index: 99999;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+#mobile-menu.active {
+  transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+  #mobile-menu {
+    display: none;
+  }
+}
+
         
         .expandable-content {
             max-height: 0;
@@ -173,6 +195,11 @@
                         Kontak
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
                     </a></li>
+                    <li><a href="#gallery" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+    Galeri
+    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+</a></li>
+
                 </ul>
                 
                 <!-- Mobile Menu Button -->
@@ -197,6 +224,8 @@
                     <li><a href="#testimonial" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Testimoni</a></li>
                     <li><a href="#location" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Lokasi</a></li>
                     <li><a href="#contact" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kontak</a></li>
+                    <li><a href="#gallery" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Galeri</a></li>
+                    
                 </ul>
             </div>
         </nav>
@@ -1004,6 +1033,78 @@
         </div>
     </section>
 
+
+   <section id="gallery" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
+  <div class="container mx-auto px-6">
+    <!-- Section Title -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold font-amiri text-primary mb-4 relative inline-block">
+        GALERI KEGIATAN
+        <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+      </h2>
+      <p class="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+        Dokumentasi beberapa momen kegiatan santri.
+      </p>
+    </div>
+    <!-- Gallery Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <!-- Foto 1 -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <img src="image/foto1.jpg" alt="Foto 1" class="object-cover w-full h-64 md:h-56 gallery-img" style="cursor:pointer">
+        <div class="p-4">
+          <h3 class="font-bold text-lg text-primary mb-2">Foto 1</h3>
+        </div>
+      </div>
+      <!-- Foto 2 -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <img src="image/foto2.jpg" alt="Foto 2" class="object-cover w-full h-64 md:h-56 gallery-img" style="cursor:pointer">
+        <div class="p-4">
+          <h3 class="font-bold text-lg text-primary mb-2">Foto 2</h3>
+        </div>
+      </div>
+      <!-- Foto 3 -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <img src="image/foto3.jpg" alt="Foto 3" class="object-cover w-full h-64 md:h-56 gallery-img" style="cursor:pointer">
+        <div class="p-4">
+          <h3 class="font-bold text-lg text-primary mb-2">Foto 3</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Lightbox -->
+<div id="lightbox" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[9999] hidden">
+  <img id="lightbox-img" class="max-w-full max-h-[80vh] rounded-xl shadow-2xl" src="" alt="Preview">
+  <button id="lightbox-close" class="absolute top-6 right-8 text-4xl text-white font-bold cursor-pointer">&times;</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+  document.querySelectorAll('.gallery-img').forEach(img => {
+    img.addEventListener('click', function () {
+      lightboxImg.src = this.src;
+      lightbox.classList.remove('hidden');
+    });
+  });
+  lightboxClose.addEventListener('click', function () {
+    lightbox.classList.add('hidden');
+    lightboxImg.src = '';
+  });
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) {
+      lightbox.classList.add('hidden');
+      lightboxImg.src = '';
+    }
+  });
+});
+</script>
+
+
+
     <!-- Footer -->
     <footer class="bg-gradient-to-r from-primary via-secondary to-success text-white py-12 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
@@ -1028,14 +1129,15 @@
             </div>
         </div>
     </footer>
+    
 
-    <!-- Notification Toast -->
+    <!-- Notification Toast
     <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
         <div class="flex items-center space-x-2">
             <i class="fas fa-check-circle"></i>
             <span id="toast-message">Berhasil!</span>
         </div>
-    </div>
+    </div> -->
 
 </body>
 </html>

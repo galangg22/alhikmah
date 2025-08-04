@@ -1,106 +1,156 @@
-async function whatsappContact(classType) {
-  // Helper SweetAlert2 Input (judul dan placeholder dinamis)
+async function whatsappContact(action) {
   async function getInput(title, placeholder) {
-    const { value, isConfirmed } = await Swal.fire({
+    const res = await Swal.fire({
       title,
       input: 'text',
       inputPlaceholder: placeholder,
       showCancelButton: true,
-      confirmButtonText: 'Lanjut',
-      cancelButtonText: 'Batal',
-      allowOutsideClick: false
+      inputValidator: v => v ? null : 'Input tidak boleh kosong!'
     });
-    if (!isConfirmed) return null;
-    if (!value || value.trim() === '') {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Harus diisi!',
-        text: 'Input tidak boleh kosong.',
-        confirmButtonText: 'OK',
-        allowOutsideClick: false
-      });
-      // Ulang input
-      return await getInput(title, placeholder);
+    if (!res.isConfirmed) {
+      await Swal.fire('Dibatalkan', 'Aksi telah dibatalkan.', 'info');
+      return null;
     }
-    return value.trim();
+    return res.value;
   }
 
-  // Proses input nama
-  const parentName = await getInput('Masukkan nama orang tua/wali:', 'Contoh: Bapak Ahmad');
-  if (!parentName) {
-    await Swal.fire('Dibatalkan', 'Pengisian data orang tua dibatalkan.', 'info');
-    return;
-  }
-  const studentName = await getInput('Masukkan nama santri:', 'Contoh: Ananda Malik');
-  if (!studentName) {
-    await Swal.fire('Dibatalkan', 'Pengisian data santri dibatalkan.', 'info');
-    return;
-  }
+  const baseUrl = 'https://wa.me/6281252596062?text=';
 
-  // Generate pesan WhatsApp
-  let message = '';
-  if (classType === 'privat') {
-    message = `Assalamu'alaikum TPQ Al Hikmah,
+  if (action === 'kelasPrivat' || action === 'kelasOffline') {
+    const ortu = await getInput('Nama orang tua/wali', 'Contoh: Bapak Ahmad');
+    if (!ortu) return;
+
+    const santri = await getInput('Nama santri', 'Contoh: Ananda Malik');
+    if (!santri) return;
+
+    const jenis = action === 'kelasPrivat' ? 'Kelas Privat' : 'Kelas Offline';
+    const msg = `Assalamu'alaikum TPQ Al Hikmah,
+
 
 Saya bermaksud untuk *mendaftarkan santri* pada program berikut:
 
-📘 *Kelas Privat TPQ Al Hikmah*
+
+📘 *${jenis} TPQ Al Hikmah*
+
 
 Berikut data calon peserta:
-1. 👤 Nama Orang Tua: *${parentName}*
-2. 🧒 Nama Santri: *${studentName}*
+1. 👤 Nama Orang Tua: ${ortu}
+2. 🧒 Nama Santri: ${santri}
+
 
 Mohon informasi lebih lanjut mengenai:
 - Jadwal belajar
 - Biaya pendaftaran dan bulanan
 - Proses pendaftaran
 
+
 Terima kasih atas bantuannya.
 Wassalamu'alaikum`;
-  } else if (classType === 'offline') {
-    message = `Assalamu'alaikum TPQ Al Hikmah,
+
+    window.open(baseUrl + encodeURIComponent(msg));
+    return;
+  }
+
+  if (action === 'hubungi') {
+    const type = await Swal.fire({
+      title: 'Pilih aksi',
+      input: 'select',
+      inputOptions: {
+        bertanya: 'Bertanya',
+        daftar: 'Mendaftar'
+      },
+      inputPlaceholder: 'Silakan pilih',
+      showCancelButton: true,
+      inputValidator: v => v ? null : 'Pilih salah satu!'
+    });
+
+    if (!type.isConfirmed) {
+      await Swal.fire('Dibatalkan', 'Aksi telah dibatalkan.', 'info');
+      return;
+    }
+
+    if (type.value === 'daftar') {
+      const cls = await Swal.fire({
+        title: 'Pilih jenis kelas',
+        input: 'radio',
+        inputOptions: {
+          privat: 'Kelas Privat',
+          offline: 'Kelas Offline'
+        },
+        showCancelButton: true,
+        inputValidator: v => v ? null : 'Pilih kelas!'
+      });
+
+      if (!cls.isConfirmed) {
+        await Swal.fire('Dibatalkan', 'Aksi telah dibatalkan.', 'info');
+        return;
+      }
+
+      const ortu = await getInput('Nama orang tua/wali', 'Contoh: Bapak Ahmad');
+      if (!ortu) return;
+
+      const santri = await getInput('Nama santri', 'Contoh: Ananda Malik');
+      if (!santri) return;
+
+      const jenis = cls.value === 'privat' ? 'Kelas Privat' : 'Kelas Offline';
+      const msg = `Assalamu'alaikum TPQ Al Hikmah,
+
 
 Saya bermaksud untuk *mendaftarkan santri* pada program berikut:
 
-🏫 *Kelas Offline TPQ Al Hikmah*
+
+📘 *${jenis} TPQ Al Hikmah*
+
 
 Berikut data calon peserta:
-1. 👤 Nama Orang Tua: *${parentName}*
-2. 🧒 Nama Santri: *${studentName}*
+1. 👤 Nama Orang Tua: ${ortu}
+2. 🧒 Nama Santri: ${santri}
+
 
 Mohon informasi lebih lanjut mengenai:
-- Jadwal kelas
+- Jadwal belajar
 - Biaya pendaftaran dan bulanan
 - Proses pendaftaran
 
+
 Terima kasih atas bantuannya.
 Wassalamu'alaikum`;
-  } else if (classType === 'location') {
-    message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Saya, ${parentName}, ingin mengetahui informasi tentang lokasi TPQ.
+      window.open(baseUrl + encodeURIComponent(msg));
+      return;
+    }
 
-Pertanyaan saya:
-- Alamat lengkap cabang
-- Jadwal operasional
-- Fasilitas
-- Akses transportasi umum
+    const nama = await getInput('Nama lengkap', 'Contoh: Bapak Ahmad');
+    if (!nama) return;
 
-Terima kasih.
+    const pert = await getInput('Pertanyaan Anda', 'Tulis pertanyaan di sini');
+    if (!pert) return;
+
+    const msg = `Assalamu'alaikum TPQ Al Hikmah,
+
+
+Saya ingin *mengajukan pertanyaan*.
+
+
+👤 Nama: ${nama}
+❓ Pertanyaan: ${pert}
+
+
+Terima kasih atas informasinya.
 Wassalamu'alaikum`;
-  } else {
-    message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Saya, ${parentName}, ingin mengetahui informasi lengkap mengenai program pembelajaran di TPQ untuk santri bernama ${studentName}.
-
-Mohon bantuan dan informasinya.
-
-Terima kasih.
-Wassalamu'alaikum`;
+    window.open(baseUrl + encodeURIComponent(msg));
+    return;
   }
 
-  const phoneNumber = '6281252596062';
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-  window.location.href = whatsappUrl;
+  await Swal.fire('Error', 'Aksi tidak dikenal', 'error');
+}
+
+// Fungsi untuk buka Instagram dan TikTok
+function openInstagram() {
+  window.open('https://instagram.com/tpqalhikmah', '_blank');
+}
+
+function openTikTok() {
+  window.open('https://www.tiktok.com/@tpqalhikmah', '_blank');
 }

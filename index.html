@@ -96,12 +96,12 @@
             -webkit-backdrop-filter: blur(15px);
         }
         
-        #mobile-menu {
+       #mobile-menu {
   position: fixed;
   top: 0;
   right: 0;
   height: 100vh;
-  width: 80vw;          /* Agar lebih lebar dan nyaman di HP, maksimal 300px */
+  width: 80vw;          /* Lebar maksimal 300px */
   max-width: 300px;
   background-color: #fff;
   box-shadow: 0 0 15px rgba(0,0,0,0.3);
@@ -119,6 +119,7 @@
     display: none;
   }
 }
+
 
         
         .expandable-content {
@@ -154,111 +155,128 @@
 <body class="font-poppins text-gray-800 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
     
     <!-- Header -->
-    <header id="header" class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-custom shadow-xl transition-all duration-300">
-        <nav class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-quran-book text-2xl text-accent animate-pulse-slow"></i>
-                    <h2 class="text-2xl font-bold font-amiri text-primary hover:text-secondary transition-colors duration-300 cursor-pointer">
-                        TPQ AL HIKMAH
-                    </h2>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <ul class="hidden md:flex space-x-8">
-                    <li><a href="#home" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Beranda
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#about" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Tentang
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#classes" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Kelas
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#programs" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Program
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#testimonial" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Testimoni
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#location" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Lokasi
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#contact" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-                        Kontak
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-                    </a></li>
-                    <li><a href="#gallery" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
-    Galeri
-    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
-</a></li>
-
-                </ul>
-                
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden text-primary text-2xl focus:outline-none">
-                    <i class="fas fa-bars"></i>
-                </button>
+<header id="header" class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-custom shadow-xl transition-all duration-300">
+    <nav class="container mx-auto px-6 py-4">
+        <div class="flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <!-- Logo image di posisi paling kiri -->
+                <img src="image/logo.jpg" alt="Logo TPQ AL HIKMAH" class="h-10 w-auto" />
+                <i class="fas fa-quran-book text-2xl text-accent animate-pulse-slow"></i>
+                <h2 class="text-2xl font-bold font-amiri text-primary hover:text-secondary transition-colors duration-300 cursor-pointer">
+                    TPQ AL HIKMAH
+                </h2>
             </div>
             
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="md:hidden mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50">
-                <div class="flex justify-between items-center p-6 border-b">
-                    <h3 class="font-bold text-primary font-amiri">Menu</h3>
-                    <button id="close-mobile-menu" class="text-gray-500 text-xl">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <ul class="p-6 space-y-4">
-                    <li><a href="#home" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Beranda</a></li>
-                    <li><a href="#about" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Tentang</a></li>
-                    <li><a href="#classes" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kelas</a></li>
-                    <li><a href="#programs" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Program</a></li>
-                    <li><a href="#testimonial" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Testimoni</a></li>
-                    <li><a href="#location" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Lokasi</a></li>
-                    <li><a href="#contact" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kontak</a></li>
-                    <li><a href="#gallery" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Galeri</a></li>
-                    
-                </ul>
+            <!-- Desktop Navigation -->
+            <ul class="hidden md:flex space-x-8">
+                <li>
+                    <a href="#home" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Beranda
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#about" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Tentang
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#classes" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Kelas
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#programs" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Program
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#testimonial" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Testimoni
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#location" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Lokasi
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#contact" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Kontak
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#gallery" class="nav-link relative px-4 py-2 text-gray-700 hover:text-primary transition-colors duration-300 group">
+                        Galeri
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-primary text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="font-bold text-primary font-amiri">Menu</h3>
+                <button id="close-mobile-menu" class="text-gray-500 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </nav>
-    </header>
+            <ul class="p-6 space-y-4">
+                <li><a href="#home" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Beranda</a></li>
+                <li><a href="#about" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Tentang</a></li>
+                <li><a href="#classes" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kelas</a></li>
+                <li><a href="#programs" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Program</a></li>
+                <li><a href="#testimonial" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Testimoni</a></li>
+                <li><a href="#location" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Lokasi</a></li>
+                <li><a href="#contact" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Kontak</a></li>
+                <li><a href="#gallery" class="block py-2 text-gray-700 hover:text-primary transition-colors duration-300">Galeri</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
 
     <!-- Hero Section -->
-    <section id="home" class="min-h-screen bg-gradient-to-br from-primary via-success to-green-800 text-white relative overflow-hidden">
+    <section id="home" class="pt-16 md:pt-0 min-h-screen bg-gradient-to-br from-primary via-success to-green-800 text-white relative overflow-hidden">
         <!-- Background Pattern -->
         <div class="absolute inset-0 bg-islamic-pattern animate-float opacity-30"></div>
         
         <!-- Hero Content -->
-        <div class="relative z-10 min-h-screen flex items-center justify-center text-center px-6">
-            <div class="max-w-4xl mx-auto">
-                <h1 class="text-5xl md:text-7xl font-bold font-amiri mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent animate-pulse tracking-wide">
-                    TPQ AL HIKMAH
-                </h1>
-                <p class="text-xl md:text-2xl mb-10 opacity-95 max-w-3xl mx-auto leading-relaxed">
-                    Membangun Generasi Qurani dengan Pendidikan Terbaik Sejak 2008
-                </p>
-                
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                    <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-accent to-yellow-400 text-primary px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-accent/50 min-w-[200px]">
-                        <i class="fas fa-user mr-2"></i>
-                        Kelas Privat
-                    </button>
-                    <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-secondary to-teal-400 text-white px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-secondary/50 min-w-[200px]">
-                        <i class="fas fa-users mr-2"></i>
-                        Kelas Offline
-                    </button>
-                </div>
-            </div>
-        </div>
+      <div class="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <!-- Logo di atas teks judul -->
+    <img src="image/logo.jpg" alt="Logo TPQ AL HIKMAH" class="mb-6 h-60 w-auto" />
+    <h1 class="text-5xl md:text-7xl font-bold font-amiri mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent animate-pulse tracking-wide">
+        TPQ AL HIKMAH
+    </h1>
+    <p class="text-xl md:text-2xl mb-10 opacity-95 max-w-3xl mx-auto leading-relaxed">
+        Membangun Generasi Qurani dengan Pendidikan Terbaik Sejak 2008
+    </p>
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+        <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-accent to-yellow-400 text-primary px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-accent/50 min-w-[200px]">
+            <i class="fas fa-user mr-2"></i>
+            Kelas Privat
+        </button>
+        <button onclick="scrollToSection('classes')" class="bg-gradient-to-r from-secondary to-teal-400 text-white px-8 py-4 rounded-full font-semibold text-lg transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-secondary/50 min-w-[200px]">
+            <i class="fas fa-users mr-2"></i>
+            Kelas Offline
+        </button>
+    </div>
+</div>
+
     </section>
 
     <!-- About Section -->
@@ -949,7 +967,7 @@
                     </button>
                 </div>
             </div>
-
+</section>
 
 
     <!-- Contact Section -->
@@ -1034,7 +1052,7 @@
     </section>
 
 
-   <section id="gallery" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
+<section id="gallery" class="py-20 bg-gradient-to-br from-gray-50 to-green-50 relative">
   <div class="container mx-auto px-6">
     <!-- Section Title -->
     <div class="text-center mb-16">
@@ -1103,8 +1121,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-
-
     <!-- Footer -->
     <footer class="bg-gradient-to-r from-primary via-secondary to-success text-white py-12 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
@@ -1130,14 +1146,5 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </footer>
     
-
-    <!-- Notification Toast
-    <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-check-circle"></i>
-            <span id="toast-message">Berhasil!</span>
-        </div>
-    </div> -->
-
 </body>
 </html>

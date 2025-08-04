@@ -14,7 +14,7 @@ async function whatsappContact(action) {
     return res.value;
   }
 
-  const baseUrl = 'https://wa.me/6281252596062?text=';
+  const baseUrl = 'https://wa.me/6285183279603?text=';
 
   if (action === 'kelasPrivat' || action === 'kelasOffline') {
     const ortu = await getInput('Nama orang tua/wali', 'Contoh: Bapak Ahmad');

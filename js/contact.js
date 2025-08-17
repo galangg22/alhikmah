@@ -1,1385 +1,1474 @@
 /* =======================================================
- * FUNGSI KONTAK WHATSAPP TPQ AL HIKMAH 
- * Version: 6.0 (Complete & Enhanced - FULLY FIXED)
- * Developer: Expert Web Developer for TPQ Al Hikmah
+ * TPQ AL HIKMAH - COMPLETE WHATSAPP CONTACT SYSTEM
+ * Version: 8.0 - FULL VERSION WITH CLICKABLE LINKS FIX
  * ====================================================== */
 
-/* =======================================================
- * CONFIGURATION & CONSTANTS
- * ====================================================== */
-
-const CONFIG = {
-    whatsappNumber: '6285183279603',
-    baseUrl: 'https://wa.me/6285183279603?text=',
-    colors: {
-        primary: '#2e8b57',
-        secondary: '#20b2aa',
-        success: '#25d366',
-        error: '#e74c3c',
-        warning: '#f39c12'
-    }
-};
-
-/* =======================================================
- * UTILITY FUNCTIONS
- * ====================================================== */
-
-// Debug logging function
-function debugLog(message, data = null) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.log(`[TPQ Debug] ${message}`, data || '');
-    }
-}
-
-// Check if device is mobile
-function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// Format WhatsApp URL with fallback
-function createWhatsAppURL(message) {
-    try {
-        const encodedMessage = encodeURIComponent(message);
-        const url = CONFIG.baseUrl + encodedMessage;
-        debugLog('WhatsApp URL created', url);
-        return url;
-    } catch (error) {
-        debugLog('Error creating WhatsApp URL', error);
-        return CONFIG.baseUrl;
-    }
-}
-
-// Open WhatsApp with multiple fallback methods
-function openWhatsApp(message) {
-    const url = createWhatsAppURL(message);
+(() => {
+    'use strict';
     
-    debugLog('Attempting to open WhatsApp', { message: message.substring(0, 100) + '...', url });
+    /* =======================================================
+     * CONFIGURATION & CONSTANTS
+     * ====================================================== */
     
-    // Method 1: Try window.open first
-    try {
-        const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-        
-        // Check if pop-up was blocked
-        setTimeout(() => {
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                debugLog('Pop-up blocked, trying alternative method');
-                fallbackWhatsApp(url);
-            } else {
-                debugLog('WhatsApp opened successfully via window.open');
-                showSuccessMessage();
-            }
-        }, 1000);
-        
-    } catch (error) {
-        debugLog('Error with window.open', error);
-        fallbackWhatsApp(url);
-    }
-}
-
-// Fallback method for opening WhatsApp
-function fallbackWhatsApp(url) {
-    debugLog('Using fallback method');
-    
-    Swal.fire({
-        title: 'Buka WhatsApp',
-        text: 'Klik tombol di bawah untuk membuka WhatsApp',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fab fa-whatsapp mr-2"></i>Buka WhatsApp',
-        cancelButtonText: 'Salin Pesan',
-        confirmButtonColor: CONFIG.colors.success,
-        cancelButtonColor: CONFIG.colors.warning
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = url;
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            copyToClipboard(url);
+    const CONFIG = {
+        whatsappNumber: '6285183279603',
+        baseUrl: 'https://wa.me/6285183279603?text=',
+        colors: {
+            primary: '#2e8b57',
+            secondary: '#20b2aa',
+            success: '#25d366',
+            error: '#e74c3c',
+            warning: '#f39c12',
+            info: '#3498db'
         }
+    };
+    
+    /* =======================================================
+     * INITIALIZATION & CSS FIXES
+     * ====================================================== */
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        addModalFixCSS();
+        initializeContactSystem();
     });
-}
-
-// Copy to clipboard function
-function copyToClipboard(text) {
-    try {
-        navigator.clipboard.writeText(text).then(() => {
+    
+    function addModalFixCSS() {
+        const style = document.createElement('style');
+        style.textContent = `
+            /* Fix SweetAlert2 z-index issues */
+            .swal2-container {
+                z-index: 20000 !important;
+            }
+            
+            .swal2-popup {
+                z-index: 20001 !important;
+            }
+            
+            .swal2-backdrop-show {
+                z-index: 19999 !important;
+            }
+            
+            /* Fix clickable links in modal */
+            .swal2-html-container a {
+                cursor: pointer !important;
+                pointer-events: auto !important;
+                text-decoration: underline !important;
+                color: #25D366 !important;
+                font-weight: bold !important;
+                transition: all 0.3s ease;
+            }
+            
+            .swal2-html-container a:hover {
+                color: #128C7E !important;
+                text-decoration: underline !important;
+                transform: scale(1.05);
+            }
+            
+            /* Custom button styles in modals */
+            .wa-btn-modal {
+                background: linear-gradient(135deg, #25D366, #128C7E) !important;
+                color: white !important;
+                border: none !important;
+                padding: 12px 24px !important;
+                border-radius: 25px !important;
+                font-weight: bold !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-decoration: none !important;
+                margin: 10px 0 !important;
+            }
+            
+            .wa-btn-modal:hover {
+                background: linear-gradient(135deg, #128C7E, #25D366) !important;
+                transform: scale(1.05) !important;
+                box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3) !important;
+            }
+            
+            .wa-btn-modal i {
+                margin-right: 8px !important;
+                font-size: 18px !important;
+            }
+            
+            /* Custom info boxes */
+            .info-box {
+                border-left: 4px solid #3498db;
+                background: #ebf3fd;
+                padding: 16px;
+                border-radius: 0 8px 8px 0;
+                margin: 16px 0;
+            }
+            
+            .warning-box {
+                border-left: 4px solid #f39c12;
+                background: #fef9e7;
+                padding: 16px;
+                border-radius: 0 8px 8px 0;
+                margin: 16px 0;
+            }
+            
+            .success-box {
+                border-left: 4px solid #27ae60;
+                background: #eafaf1;
+                padding: 16px;
+                border-radius: 0 8px 8px 0;
+                margin: 16px 0;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    function initializeContactSystem() {
+        // Initialize any additional contact system features
+        console.log('TPQ Contact System initialized');
+    }
+    
+    /* =======================================================
+     * DEVICE DETECTION & UTILITIES
+     * ====================================================== */
+    
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    function createWhatsAppURL(message) {
+        try {
+            const encodedMessage = encodeURIComponent(message);
+            return CONFIG.baseUrl + encodedMessage;
+        } catch (error) {
+            console.warn('Error creating WhatsApp URL:', error);
+            return CONFIG.baseUrl;
+        }
+    }
+    
+    function openWhatsApp(message) {
+        const url = createWhatsAppURL(message);
+        
+        if (isMobile()) {
+            window.location.href = url;
+        } else {
+            try {
+                const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+                
+                setTimeout(() => {
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        window.location.href = url;
+                    }
+                }, 500);
+                
+            } catch (error) {
+                window.location.href = url;
+            }
+        }
+        
+        setTimeout(() => {
             Swal.fire({
                 icon: 'success',
-                title: 'Berhasil!',
-                text: 'Link WhatsApp telah disalin ke clipboard',
+                title: 'WhatsApp Terbuka!',
+                text: 'Pesan Anda akan segera terkirim',
                 timer: 2000,
-                showConfirmButton: false
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
             });
-        });
-    } catch (error) {
-        debugLog('Clipboard API not available', error);
-        
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Link WhatsApp telah disalin',
-            timer: 2000,
-            showConfirmButton: false
-        });
+        }, 800);
     }
-}
+    
+    /* =======================================================
+     * VALIDATION FUNCTIONS
+     * ====================================================== */
+    
+    function validateWhatsAppNumber(number) {
+        const cleanNumber = number.replace(/[\s\-\(\)]/g, '');
+        const waRegex = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
+        return waRegex.test(cleanNumber);
+    }
+    
+    function validateRequiredFields(fields) {
+        let isValid = true;
+        const missingFields = [];
+        
+        fields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#ef4444';
+                    field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                    missingFields.push(fieldId);
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#10b981';
+                    field.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                }
+            }
+        });
+        
+        return { isValid, missingFields };
+    }
+    
+    /* =======================================================
+     * INPUT HELPERS
+     * ====================================================== */
+    
+    async function getInput(title, placeholder, inputType = 'text', validationFn = null) {
+        const result = await Swal.fire({
+            title,
+            input: inputType,
+            inputPlaceholder: placeholder,
+            showCancelButton: true,
+            confirmButtonColor: CONFIG.colors.primary,
+            cancelButtonColor: CONFIG.colors.error,
+            confirmButtonText: 'Lanjutkan',
+            cancelButtonText: 'Batal',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Input tidak boleh kosong!';
+                }
+                if (validationFn && !validationFn(value)) {
+                    return 'Format input tidak valid!';
+                }
+                return null;
+            },
+            customClass: {
+                container: 'swal-high-zindex'
+            }
+        });
+        
+        if (!result.isConfirmed) {
+            await Swal.fire({
+                title: 'Dibatalkan',
+                text: 'Aksi telah dibatalkan.',
+                icon: 'info',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+            return null;
+        }
+        return result.value.trim();
+    }
+    
+    /* =======================================================
+     * TEACHER APPLICATION SYSTEM
+     * ====================================================== */
+    
+    async function showTeacherOptions() {
+        const teacherType = await Swal.fire({
+            title: '👨‍🏫 Pilih Jenis Guru Pengajar',
+            text: 'Silakan pilih posisi yang Anda inginkan:',
+            input: 'radio',
+            inputOptions: {
+                'tahfidz': '🕌 Guru Tahfidz (Hafal 30 Juz lengkap)',
+                'jilid': '📖 Guru Jilid (Hafal minimal Juz 30)'
+            },
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Silakan pilih jenis guru yang diinginkan!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-arrow-right mr-2"></i>Lanjutkan',
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+            confirmButtonColor: CONFIG.colors.primary,
+            cancelButtonColor: CONFIG.colors.error,
+            width: '500px',
+            customClass: {
+                container: 'swal-high-zindex'
+            }
+        });
 
-// Show success message
-function showSuccessMessage() {
-    setTimeout(() => {
-        Swal.fire({
+        if (teacherType.isConfirmed) {
+            if (teacherType.value === 'tahfidz') {
+                return await handleTahfidzTeacher();
+            } else if (teacherType.value === 'jilid') {
+                return await handleJilidTeacher();
+            }
+        }
+        
+        return null;
+    }
+    
+    async function handleTahfidzTeacher() {
+        const steps = [
+            { title: 'Nama Lengkap Anda', placeholder: 'Contoh: Ustadz Ahmad Fauzan, S.Pd.I' },
+            { title: 'Pendidikan Terakhir', placeholder: 'Contoh: S1 Pendidikan Agama Islam / Pesantren Al-Azhar' },
+            { title: 'Pengalaman Mengajar Tahfidz', placeholder: 'Contoh: 5 tahun mengajar tahfidz di Ponpes Al-Ikhlas' },
+            { title: 'Detail Hafalan Al-Qur\'an', placeholder: 'Contoh: 30 Juz dengan sanad dari Syekh Abdullah, ijazah tahfidz tahun 2020' },
+            { title: 'Metode Tahfidz yang Dikuasai', placeholder: 'Contoh: Metode Tilawati, Yanbu\'a, One Day One Ayat, dll.' }
+        ];
+        
+        const data = {};
+        const stepKeys = ['nama', 'pendidikan', 'pengalaman', 'hafalanDetail', 'metodeTahfidz'];
+        
+        for (let i = 0; i < steps.length; i++) {
+            const input = await getInput(
+                `${i + 1}/5 - ${steps[i].title}`,
+                steps[i].placeholder
+            );
+            
+            if (!input) return null;
+            data[stepKeys[i]] = input;
+        }
+        
+        const accepted = await confirmTahfidzTerms();
+        if (!accepted) {
+            await Swal.fire({
+                title: 'Pendaftaran Dibatalkan',
+                text: 'Anda harus memenuhi semua persyaratan untuk mendaftar sebagai Guru Tahfidz.',
+                icon: 'warning',
+                confirmButtonColor: CONFIG.colors.warning
+            });
+            return null;
+        }
+
+        const message = createTahfidzMessage(data);
+        openWhatsApp(message);
+        
+        await Swal.fire({
             icon: 'success',
-            title: 'Berhasil!',
-            text: 'WhatsApp akan segera terbuka. Jika tidak, silakan coba lagi.',
+            title: 'Pendaftaran Berhasil Dikirim!',
+            text: 'Data pendaftaran Guru Tahfidz telah dikirim ke WhatsApp TPQ Al Hikmah.',
             timer: 3000,
             showConfirmButton: false
         });
-    }, 1500);
-}
-
-/* =======================================================
- * FORM VALIDATION FUNCTIONS
- * ====================================================== */
-
-// Validate WhatsApp number
-function validateWhatsAppNumber(number) {
-    const cleanNumber = number.replace(/[\s\-\(\)]/g, '');
-    const waRegex = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
-    return waRegex.test(cleanNumber);
-}
-
-// Validate required fields
-function validateRequiredFields(fields) {
-    let isValid = true;
-    const missingFields = [];
-    
-    fields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            if (!field.value.trim()) {
-                field.classList.add('border-red-500');
-                field.style.borderColor = '#ef4444';
-                missingFields.push(fieldId);
-                isValid = false;
-            } else {
-                field.classList.remove('border-red-500');
-                field.style.borderColor = '#d1d5db';
-            }
-        }
-    });
-    
-    debugLog('Field validation result', { isValid, missingFields });
-    return { isValid, missingFields };
-}
-
-/* =======================================================
- * FORM PENDAFTARAN HANDLER
- * ====================================================== */
-
-document.addEventListener('DOMContentLoaded', function() {
-    debugLog('DOM Content Loaded - Initializing form handlers');
-    
-    const registrationForm = document.getElementById('registrationForm');
-    
-    if (registrationForm) {
-        debugLog('Registration form found, attaching event listener');
         
-        registrationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            debugLog('Registration form submitted');
-            
-            // Show loading state
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
-            submitButton.disabled = true;
-            
-            // Validate form
-            const requiredFields = ['namaAnak', 'usiaAnak', 'namaOrtu', 'nomorWA', 'jenisKelas', 'lokasi'];
-            const validation = validateRequiredFields(requiredFields);
-            
-            if (!validation.isValid) {
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Form Belum Lengkap',
-                    text: `Mohon lengkapi field: ${validation.missingFields.join(', ')}`,
-                    confirmButtonColor: CONFIG.colors.error
-                });
-                return;
-            }
-            
-            // Validate WhatsApp number
-            const nomorWA = document.getElementById('nomorWA').value;
-            if (!validateWhatsAppNumber(nomorWA)) {
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Nomor WhatsApp Tidak Valid',
-                    text: 'Contoh format yang benar: 081234567890 atau +6281234567890',
-                    confirmButtonColor: CONFIG.colors.error
-                });
-                return;
-            }
-            
-            // Collect form data
-            const formData = {
-                namaAnak: document.getElementById('namaAnak').value.trim(),
-                usiaAnak: document.getElementById('usiaAnak').value,
-                namaOrtu: document.getElementById('namaOrtu').value.trim(),
-                nomorWA: nomorWA.trim(),
-                jenisKelas: document.getElementById('jenisKelas').value,
-                lokasi: document.getElementById('lokasi').value,
-                pengalaman: document.getElementById('pengalaman')?.value || 'Tidak disebutkan',
-                catatan: document.getElementById('catatan')?.value.trim() || 'Tidak ada'
-            };
-            
-            debugLog('Form data collected', formData);
-            
-            // Send to WhatsApp
-            setTimeout(() => {
-                sendRegistrationToWhatsApp(formData);
-                
-                // Reset form after successful submission
-                setTimeout(() => {
-                    this.reset();
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
-                }, 2000);
-            }, 1000);
-        });
-    } else {
-        debugLog('Registration form not found on this page');
+        return true;
     }
-});
-
-/* =======================================================
- * UTILITY FUNCTIONS FOR SWEETALERT
- * ====================================================== */
-
-async function getInput(title, placeholder, inputType = 'text') {
-    const res = await Swal.fire({
-        title,
-        input: inputType,
-        inputPlaceholder: placeholder,
-        showCancelButton: true,
-        confirmButtonColor: CONFIG.colors.primary,
-        cancelButtonColor: CONFIG.colors.error,
-        inputValidator: v => v ? null : 'Input tidak boleh kosong!'
-    });
     
-    if (!res.isConfirmed) {
+    async function handleJilidTeacher() {
+        const steps = [
+            { title: 'Nama Lengkap Anda', placeholder: 'Contoh: Ustadzah Fatimah Azzahra, S.Pd' },
+            { title: 'Pendidikan Terakhir', placeholder: 'Contoh: S1 Pendidikan Guru Madrasah Ibtidaiyah' },
+            { title: 'Pengalaman Mengajar Baca Tulis Al-Qur\'an', placeholder: 'Contoh: 3 tahun mengajar jilid di TPQ Al-Falah' },
+            { title: 'Konfirmasi Hafalan Juz 30', placeholder: 'Contoh: Hafal Juz 30 lengkap sejak 2019, sering memimpin sholat tarawih' },
+            { title: 'Metode Pembelajaran yang Dikuasai', placeholder: 'Contoh: Qira\'ati, Iqro, Tilawati, Yanbu\'a, dll.' }
+        ];
+        
+        const data = {};
+        const stepKeys = ['nama', 'pendidikan', 'pengalaman', 'hafalanJuz30', 'metodeJilid'];
+        
+        for (let i = 0; i < steps.length; i++) {
+            const input = await getInput(
+                `${i + 1}/5 - ${steps[i].title}`,
+                steps[i].placeholder
+            );
+            
+            if (!input) return null;
+            data[stepKeys[i]] = input;
+        }
+        
+        const accepted = await confirmJilidTerms();
+        if (!accepted) {
+            await Swal.fire({
+                title: 'Pendaftaran Dibatalkan', 
+                text: 'Anda harus memenuhi semua persyaratan untuk mendaftar sebagai Guru Jilid.',
+                icon: 'warning',
+                confirmButtonColor: CONFIG.colors.warning
+            });
+            return null;
+        }
+
+        const message = createJilidMessage(data);
+        openWhatsApp(message);
+        
         await Swal.fire({
-            title: 'Dibatalkan',
-            text: 'Aksi telah dibatalkan.',
-            icon: 'info',
-            timer: 2000,
+            icon: 'success',
+            title: 'Pendaftaran Berhasil Dikirim!',
+            text: 'Data pendaftaran Guru Jilid telah dikirim ke WhatsApp TPQ Al Hikmah.',
+            timer: 3000,
             showConfirmButton: false
         });
-        return null;
-    }
-    return res.value.trim();
-}
-
-/* =======================================================
- * GURU REGISTRATION FUNCTIONS - UPDATED & FIXED
- * ====================================================== */
-
-// Function to show teacher registration options
-async function showTeacherOptions() {
-    const teacherType = await Swal.fire({
-        title: '👨‍🏫 Pilih Jenis Guru Pengajar',
-        text: 'Silakan pilih posisi yang Anda inginkan:',
-        input: 'radio',
-        inputOptions: {
-            'tahfidz': '🕌 Guru Tahfidz (Hafal 30 Juz)',
-            'jilid': '📖 Guru Jilid (Hafal Min. Juz 30)'
-        },
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Silakan pilih jenis guru!';
-            }
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Lanjutkan',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: CONFIG.colors.primary,
-        cancelButtonColor: CONFIG.colors.error,
-        width: '450px'
-    });
-
-    if (teacherType.isConfirmed) {
-        if (teacherType.value === 'tahfidz') {
-            return handleTahfidzTeacher();
-        } else if (teacherType.value === 'jilid') {
-            return handleJilidTeacher();
-        }
+        
+        return true;
     }
     
-    return null;
-}
-
-// Handle Tahfidz Teacher Registration
-async function handleTahfidzTeacher() {
-    debugLog('Processing Tahfidz Teacher application');
+    /* =======================================================
+     * MESSAGE CREATORS
+     * ====================================================== */
     
-    const nama = await getInput('Nama Lengkap Anda', 'Contoh: Ustadz Ahmad Fauzan, S.Pd.I');
-    if (!nama) return;
-
-    const pendidikan = await getInput('Pendidikan Terakhir', 'Contoh: S1 Pendidikan Agama Islam / Pesantren');
-    if (!pendidikan) return;
-
-    const pengalaman = await getInput('Pengalaman Mengajar Tahfidz', 'Contoh: 5 tahun mengajar tahfidz di Ponpes Al-Ikhlas');
-    if (!pengalaman) return;
-
-    const hafalanDetail = await getInput('Detail Hafalan Al-Qur\'an', 'Contoh: 30 Juz dengan sanad dari Syekh Abdullah, ijazah tahfidz tahun 2020');
-    if (!hafalanDetail) return;
-
-    const metodeTahfidz = await getInput('Metode Tahfidz yang Dikuasai', 'Contoh: Metode Tilawati, Yanbu\'a, One Day One Ayat, dll.');
-    if (!metodeTahfidz) return;
-
-    const accepted = await confirmTahfidzTerms();
-    if (!accepted) {
-        await Swal.fire({
-            title: 'Pendaftaran Dibatalkan',
-            text: 'Anda harus memenuhi persyaratan untuk mendaftar sebagai Guru Tahfidz.',
-            icon: 'warning',
-            confirmButtonColor: CONFIG.colors.warning
-        });
-        return;
-    }
-
-    const message = `*🕌 PENDAFTARAN GURU TAHFIDZ TPQ AL HIKMAH*
+    function createTahfidzMessage(data) {
+        return `*🕌 PENDAFTARAN GURU TAHFIDZ TPQ AL HIKMAH*
 
 Assalamu'alaikum warahmatullahi wabarakatuh,
 
 Saya bermaksud untuk *mendaftar sebagai Guru Tahfidz* di TPQ Al Hikmah.
 
 *📋 DATA LENGKAP CALON GURU:*
-👤 *Nama:* ${nama}
-🎓 *Pendidikan:* ${pendidikan}
-👨‍🏫 *Pengalaman Tahfidz:* ${pengalaman}
-📖 *Detail Hafalan:* ${hafalanDetail}
-🎯 *Metode yang Dikuasai:* ${metodeTahfidz}
+👤 *Nama:* ${data.nama}
+🎓 *Pendidikan:* ${data.pendidikan}
+👨‍🏫 *Pengalaman Tahfidz:* ${data.pengalaman}
+📖 *Detail Hafalan:* ${data.hafalanDetail}
+🎯 *Metode yang Dikuasai:* ${data.metodeTahfidz}
 
 *✅ PERSYARATAN YANG DIPENUHI:*
 • ✅ Hafal Al-Qur'an 30 Juz dengan sanad yang jelas
 • ✅ Memiliki ijazah tahfidz dari ustadz/kyai yang kompeten
-• ✅ Menguasai ilmu tajwid dengan baik
+• ✅ Menguasai ilmu tajwid dengan baik dan benar
 • ✅ Memiliki pengalaman mengajar tahfidz
 • ✅ Mampu membimbing santri dengan sabar dan telaten
 • ✅ Memiliki kemampuan mengoreksi bacaan santri
 
-*🎯 SIAP UNTUK:*
-• Mengajar program tahfidz Al-Qur'an
-• Membimbing santri dari tingkat pemula hingga lanjutan  
-• Menerapkan metode tahfidz yang efektif
-• Melakukan evaluasi dan monitoring hafalan santri
-• Bekerjasama dengan tim pengajar lainnya
-
-Saya siap melampirkan:
-📄 Ijazah tahfidz dan sertifikat pendukung
-📄 CV lengkap dan foto
-📄 Surat keterangan sehat
-📄 Surat keterangan berkelakuan baik
+*🎯 KOMITMEN SAYA:*
+• Siap mengikuti tes seleksi yang diadakan TPQ
+• Siap mengajar dengan penuh tanggung jawab
+• Siap mengikuti program pelatihan guru
+• Siap berkomitmen jangka panjang
 
 Mohon informasi lebih lanjut terkait:
-• Proses seleksi dan tes hafalan
-• Jadwal mengajar yang tersedia
-• Sistem kompensasi guru tahfidz
-• Kurikulum dan target pembelajaran
+- Proses seleksi dan tahapannya
+- Jadwal tes dan wawancara
+- Persyaratan dokumen yang harus disiapkan
+- Sistem kerja dan kompensasi
 
 Terima kasih atas kesempatan yang diberikan.
 Barakallahu fiikum.
 
 Wassalamu'alaikum warahmatullahi wabarakatuh`;
-
-    openWhatsApp(message);
-}
-
-// Handle Jilid Teacher Registration  
-async function handleJilidTeacher() {
-    debugLog('Processing Jilid Teacher application');
-    
-    const nama = await getInput('Nama Lengkap Anda', 'Contoh: Ustadzah Fatimah Azzahra, S.Pd');
-    if (!nama) return;
-
-    const pendidikan = await getInput('Pendidikan Terakhir', 'Contoh: S1 Pendidikan Guru Madrasah Ibtidaiyah');
-    if (!pendidikan) return;
-
-    const pengalaman = await getInput('Pengalaman Mengajar Baca Tulis Al-Qur\'an', 'Contoh: 3 tahun mengajar jilid di TPQ Al-Falah');
-    if (!pengalaman) return;
-
-    const hafalanJuz30 = await getInput('Konfirmasi Hafalan Juz 30', 'Contoh: Hafal Juz 30 lengkap sejak 2019, sering memimpin sholat tarawih');
-    if (!hafalanJuz30) return;
-
-    const metodeJilid = await getInput('Metode Pembelajaran yang Dikuasai', 'Contoh: Qira\'ati, Iqro, Tilawati, Yanbu\'a, dll.');
-    if (!metodeJilid) return;
-
-    const accepted = await confirmJilidTerms();
-    if (!accepted) {
-        await Swal.fire({
-            title: 'Pendaftaran Dibatalkan', 
-            text: 'Anda harus memenuhi persyaratan untuk mendaftar sebagai Guru Jilid.',
-            icon: 'warning',
-            confirmButtonColor: CONFIG.colors.warning
-        });
-        return;
     }
-
-    const message = `*📖 PENDAFTARAN GURU JILID TPQ AL HIKMAH*
+    
+    function createJilidMessage(data) {
+        return `*📖 PENDAFTARAN GURU JILID TPQ AL HIKMAH*
 
 Assalamu'alaikum warahmatullahi wabarakatuh,
 
 Saya bermaksud untuk *mendaftar sebagai Guru Jilid* di TPQ Al Hikmah.
 
 *📋 DATA LENGKAP CALON GURU:*
-👤 *Nama:* ${nama}
-🎓 *Pendidikan:* ${pendidikan}
-👨‍🏫 *Pengalaman Mengajar:* ${pengalaman}  
-📖 *Hafalan Juz 30:* ${hafalanJuz30}
-🎯 *Metode yang Dikuasai:* ${metodeJilid}
+👤 *Nama:* ${data.nama}
+🎓 *Pendidikan:* ${data.pendidikan}
+👨‍🏫 *Pengalaman Mengajar:* ${data.pengalaman}  
+📖 *Hafalan Juz 30:* ${data.hafalanJuz30}
+🎯 *Metode yang Dikuasai:* ${data.metodeJilid}
 
 *✅ PERSYARATAN YANG DIPENUHI:*
 • ✅ Hafal minimal Juz 30 (Juz 'Amma) dengan lancar
 • ✅ Menguasai kaidah tajwid dengan baik
 • ✅ Memiliki pengalaman mengajar baca tulis Al-Qur'an
 • ✅ Menguasai metode pembelajaran jilid/iqro
-• ✅ Mampu mengajar anak-anak dengan sabar
-• ✅ Memiliki kemampuan mengoreksi bacaan dan tajwid
+• ✅ Mampu mengajar anak-anak dengan sabar dan penuh kasih sayang
+• ✅ Memiliki kemampuan mengoreksi bacaan santri
 
-*🎯 SIAP UNTUK:*
-• Mengajar jilid 1-6 / Iqro 1-6
-• Membimbing santri belajar huruf hijaiyah
-• Mengajarkan kaidah tajwid dasar
-• Melatih kelancaran membaca Al-Qur'an
-• Mempersiapkan santri untuk program lanjutan
-
-Saya siap melampirkan:
-📄 Ijazah pendidikan dan sertifikat mengajar
-📄 CV lengkap dan foto
-📄 Surat keterangan sehat  
-📄 Surat keterangan berkelakuan baik
+*🎯 KOMITMEN SAYA:*
+• Siap mengikuti tes seleksi yang diadakan TPQ
+• Siap mengajar dengan penuh dedikasi
+• Siap mengikuti program pelatihan guru
+• Siap berkomitmen jangka panjang
 
 Mohon informasi lebih lanjut terkait:
-• Proses seleksi dan tes kemampuan mengajar
-• Jadwal mengajar yang tersedia
-• Sistem kompensasi guru jilid
-• Kurikulum dan bahan ajar yang digunakan
+- Proses seleksi dan tahapannya
+- Jadwal tes dan wawancara
+- Persyaratan dokumen yang harus disiapkan
+- Sistem kerja dan kompensasi
 
 Terima kasih atas kesempatan yang diberikan.
 Barakallahu fiikum.
 
 Wassalamu'alaikum warahmatullahi wabarakatuh`;
-
-    openWhatsApp(message);
-}
-
-// Terms confirmation for Tahfidz Teacher - FIXED HTML
-async function confirmTahfidzTerms() {
-    const { isConfirmed } = await Swal.fire({
-        title: '🕌 Persyaratan Guru Tahfidz',
-        html: `
-            <div class="text-left max-h-96 overflow-y-auto p-4">
-                <p class="font-semibold mb-4">Pastikan Anda memenuhi kriteria khusus Guru Tahfidz:</p>
-                
-                <div class="bg-blue-50 p-4 rounded-lg mb-4 border-l-4 border-blue-500">
-                    <h4 class="font-semibold text-blue-800 mb-2">📖 Persyaratan Hafalan:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ <strong>Hafal Al-Qur'an 30 Juz lengkap</strong></li>
-                        <li>✅ Memiliki sanad hafalan yang jelas dari ustadz/kyai</li>
-                        <li>✅ Memiliki ijazah tahfidz yang sah</li>
-                        <li>✅ Mampu membaca dengan tartil dan sesuai kaidah tajwid</li>
-                    </ul>
-                </div>
-
-                <div class="bg-green-50 p-4 rounded-lg mb-4 border-l-4 border-green-500">
-                    <h4 class="font-semibold text-green-800 mb-2">🎯 Kemampuan Mengajar:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ Pengalaman mengajar tahfidz minimal 2 tahun</li>
-                        <li>✅ Menguasai metode tahfidz (tilawati, yanbu'a, dll)</li>
-                        <li>✅ Mampu mengoreksi hafalan dan bacaan santri</li>
-                        <li>✅ Sabar dan telaten dalam membimbing</li>
-                    </ul>
-                </div>
-
-                <div class="bg-yellow-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
-                    <h4 class="font-semibold text-yellow-800 mb-2">📋 Persyaratan Umum:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ Pendidikan minimal SMA/MA (diutamakan S1)</li>
-                        <li>✅ Berkelakuan baik dan berakhlak mulia</li>
-                        <li>✅ Sehat jasmani dan rohani</li>
-                        <li>✅ Mampu bekerjasama dalam tim</li>
-                    </ul>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg mt-4">
-                    <input type="checkbox" id="tahfidzTermsCheckbox" class="mr-2">
-                    <label for="tahfidzTermsCheckbox" class="font-semibold">Saya menyatakan telah memenuhi SEMUA persyaratan Guru Tahfidz di atas dan siap mengikuti tes seleksi.</label>
-                </div>
-            </div>
-        `,
-        width: '600px',
-        focusConfirm: false,
-        confirmButtonText: 'Lanjutkan Pendaftaran',
-        showCancelButton: true,
-        cancelButtonText: 'Batal',
-        confirmButtonColor: CONFIG.colors.success,
-        cancelButtonColor: CONFIG.colors.error,
-        preConfirm: () => {
-            const checkbox = document.getElementById('tahfidzTermsCheckbox');
-            if (!checkbox.checked) {
-                Swal.showValidationMessage('Anda harus menyetujui bahwa telah memenuhi persyaratan ini.');
-                return false;
-            }
-            return true;
-        }
-    });
-    return isConfirmed;
-}
-
-// Terms confirmation for Jilid Teacher - FIXED HTML
-async function confirmJilidTerms() {
-    const { isConfirmed } = await Swal.fire({
-        title: '📖 Persyaratan Guru Jilid',
-        html: `
-            <div class="text-left max-h-96 overflow-y-auto p-4">
-                <p class="font-semibold mb-4">Pastikan Anda memenuhi kriteria khusus Guru Jilid:</p>
-                
-                <div class="bg-blue-50 p-4 rounded-lg mb-4 border-l-4 border-blue-500">
-                    <h4 class="font-semibold text-blue-800 mb-2">📖 Persyaratan Hafalan:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ <strong>Hafal minimal Juz 30 (Juz 'Amma) lengkap</strong></li>
-                        <li>✅ Hafal surat-surat pendek yang sering dibaca</li>
-                        <li>✅ Mampu membaca Al-Qur'an dengan lancar dan tartil</li>
-                        <li>✅ Menguasai kaidah tajwid dengan baik</li>
-                    </ul>
-                </div>
-
-                <div class="bg-green-50 p-4 rounded-lg mb-4 border-l-4 border-green-500">
-                    <h4 class="font-semibold text-green-800 mb-2">🎯 Kemampuan Mengajar:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ Pengalaman mengajar baca tulis Al-Qur'an</li>
-                        <li>✅ Menguasai metode jilid/iqro (Qira'ati, Tilawati, dll)</li>
-                        <li>✅ Mampu mengajar huruf hijaiyah dan tajwid dasar</li>
-                        <li>✅ Sabar dalam mengajar anak-anak</li>
-                    </ul>
-                </div>
-
-                <div class="bg-yellow-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
-                    <h4 class="font-semibold text-yellow-800 mb-2">📋 Persyaratan Umum:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>✅ Pendidikan minimal SMA/MA</li>
-                        <li>✅ Berkelakuan baik dan berakhlak mulia</li>
-                        <li>✅ Sehat jasmani dan rohani</li>
-                        <li>✅ Mampu bekerjasama dalam tim</li>
-                        <li>✅ Diutamakan memiliki sertifikat mengajar</li>
-                    </ul>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg mt-4">
-                    <input type="checkbox" id="jilidTermsCheckbox" class="mr-2">
-                    <label for="jilidTermsCheckbox" class="font-semibold">Saya menyatakan telah memenuhi SEMUA persyaratan Guru Jilid di atas dan siap mengikuti tes seleksi.</label>
-                </div>
-            </div>
-        `,
-        width: '600px',
-        focusConfirm: false,
-        confirmButtonText: 'Lanjutkan Pendaftaran',
-        showCancelButton: true,
-        cancelButtonText: 'Batal',
-        confirmButtonColor: CONFIG.colors.success,
-        cancelButtonColor: CONFIG.colors.error,
-        preConfirm: () => {
-            const checkbox = document.getElementById('jilidTermsCheckbox');
-            if (!checkbox.checked) {
-                Swal.showValidationMessage('Anda harus menyetujui bahwa telah memenuhi persyaratan ini.');
-                return false;
-            }
-            return true;
-        }
-    });
-    return isConfirmed;
-}
-
-/* =======================================================
- * WHATSAPP CONTACT MAIN FUNCTION
- * ====================================================== */
-
-async function whatsappContact(action) {
-    debugLog('whatsappContact called with action:', action);
+    }
     
-    /* Action Handlers */
+    /* =======================================================
+     * TERMS CONFIRMATION
+     * ====================================================== */
     
-    // 1. Kelas Privat
-    if (action === 'kelasPrivat') {
-        debugLog('Showing registration form for Kelas Privat');
-        showRegistrationForm('privat');
-        return;
-    }
+    async function confirmTahfidzTerms() {
+        const { isConfirmed } = await Swal.fire({
+            title: '🕌 Persyaratan Guru Tahfidz',
+            html: `
+                <div class="text-left max-h-96 overflow-y-auto p-4">
+                    <p class="font-semibold mb-4 text-center">Pastikan Anda memenuhi SEMUA kriteria khusus Guru Tahfidz:</p>
+                    
+                    <div class="info-box">
+                        <h4 class="font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-book-quran mr-2"></i>Persyaratan Hafalan:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>✅ <strong>Hafal Al-Qur'an 30 Juz lengkap tanpa kesalahan</strong></li>
+                            <li>✅ Memiliki sanad hafalan yang jelas dari ustadz/kyai yang kompeten</li>
+                            <li>✅ Memiliki ijazah tahfidz yang sah dan diakui</li>
+                            <li>✅ Mampu membaca dengan tartil dan sesuai kaidah tajwid</li>
+                            <li>✅ Hafalan masih terjaga dengan baik hingga saat ini</li>
+                        </ul>
+                    </div>
 
-    // 2. Kelas Offline  
-    if (action === 'kelasOffline') {
-        debugLog('Showing registration form for Kelas Offline');
-        showRegistrationForm('offline');
-        return;
-    }
+                    <div class="success-box">
+                        <h4 class="font-semibold text-green-800 mb-2">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>Kemampuan Mengajar:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>✅ Pengalaman mengajar tahfidz minimal 2 tahun</li>
+                            <li>✅ Menguasai berbagai metode tahfidz (tilawati, yanbu'a, dll)</li>
+                            <li>✅ Mampu mengoreksi hafalan dan bacaan santri dengan tepat</li>
+                            <li>✅ Sabar, telaten, dan penuh kasih sayang dalam membimbing</li>
+                            <li>✅ Mampu memotivasi santri dalam proses menghafal</li>
+                        </ul>
+                    </div>
 
-    // 3. Guru Pengajar - UPDATED
-    if (action === 'guruPengajar') {
-        debugLog('Processing Guru Pengajar application - showing options');
-        await showTeacherOptions();
-        return;
-    }
-
-    // 4. Hubungi (Multi-purpose)
-    if (action === 'hubungi') {
-        debugLog('Showing contact options menu');
-        
-        const type = await Swal.fire({
-            title: 'Pilih Jenis Layanan',
-            text: 'Apa yang ingin Anda lakukan?',
-            input: 'select',
-            inputOptions: {
-                daftar: '📝 Mendaftar Santri (Form Lengkap)',
-                bertanya: '❓ Bertanya / Konsultasi',
-                guru: '👨‍🏫 Daftar Guru Pengajar',
-                kunjungan: '🏢 Jadwal Kunjungan ke TPQ',
-                info_biaya: '💰 Info Biaya & Paket Belajar'
-            },
-            inputPlaceholder: 'Silakan pilih layanan yang dibutuhkan',
+                    <div class="warning-box">
+                        <h4 class="font-semibold text-orange-800 mb-2">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Komitmen yang Diperlukan:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>⚡ Siap mengikuti tes seleksi Al-Qur'an dan wawancara</li>
+                            <li>⚡ Siap bekerja dengan sistem yang sudah ditetapkan TPQ</li>
+                            <li>⚡ Siap mengikuti pelatihan dan pengembangan berkelanjutan</li>
+                            <li>⚡ Berkomitmen jangka panjang minimal 1 tahun</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mt-4 border-2 border-gray-200">
+                        <label class="flex items-start space-x-3 cursor-pointer">
+                            <input type="checkbox" id="tahfidzTermsCheckbox" class="mt-1">
+                            <span class="font-semibold text-gray-800">
+                                Saya dengan ini menyatakan bahwa telah memenuhi <strong>SEMUA</strong> 
+                                persyaratan Guru Tahfidz di atas dan siap mengikuti seluruh proses seleksi 
+                                yang diadakan oleh TPQ Al Hikmah.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            `,
+            width: '650px',
+            focusConfirm: false,
+            confirmButtonText: '<i class="fas fa-check mr-2"></i>Ya, Saya Memenuhi Persyaratan',
             showCancelButton: true,
-            confirmButtonColor: CONFIG.colors.primary,
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+            confirmButtonColor: CONFIG.colors.success,
             cancelButtonColor: CONFIG.colors.error,
-            inputValidator: v => v ? null : 'Pilih salah satu layanan!'
+            customClass: {
+                container: 'swal-high-zindex'
+            },
+            preConfirm: () => {
+                const checkbox = document.getElementById('tahfidzTermsCheckbox');
+                if (!checkbox.checked) {
+                    Swal.showValidationMessage('Anda harus menyetujui bahwa telah memenuhi semua persyaratan ini.');
+                    return false;
+                }
+                return true;
+            }
         });
-        
-        if (!type.isConfirmed) {
-            await Swal.fire({
-                title: 'Dibatalkan',
-                text: 'Tidak ada layanan yang dipilih.',
-                icon: 'info',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            return;
-        }
+        return isConfirmed;
+    }
+    
+    async function confirmJilidTerms() {
+        const { isConfirmed } = await Swal.fire({
+            title: '📖 Persyaratan Guru Jilid',
+            html: `
+                <div class="text-left max-h-96 overflow-y-auto p-4">
+                    <p class="font-semibold mb-4 text-center">Pastikan Anda memenuhi SEMUA kriteria khusus Guru Jilid:</p>
+                    
+                    <div class="info-box">
+                        <h4 class="font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-book-open mr-2"></i>Persyaratan Hafalan:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>✅ <strong>Hafal minimal Juz 30 (Juz 'Amma) lengkap dan lancar</strong></li>
+                            <li>✅ Hafal surat-surat pendek yang sering dibaca dalam sholat</li>
+                            <li>✅ Mampu membaca Al-Qur'an dengan lancar dan tartil</li>
+                            <li>✅ Menguasai kaidah tajwid dengan baik dan benar</li>
+                            <li>✅ Mampu mencontohkan bacaan yang benar untuk santri</li>
+                        </ul>
+                    </div>
 
-        // Handle different service types
-        switch (type.value) {
-            case 'daftar':
-                showRegistrationForm();
-                return;
-                
-            case 'guru':
-                await showTeacherOptions();
-                return;
-                
-            case 'bertanya':
-                const nama = await getInput('Nama Lengkap', 'Contoh: Bapak Ahmad Wijaya');
-                if (!nama) return;
-                
-                const pertanyaan = await getInput('Pertanyaan Anda', 'Tulis pertanyaan atau konsultasi yang ingin disampaikan', 'textarea');
-                if (!pertanyaan) return;
+                    <div class="success-box">
+                        <h4 class="font-semibold text-green-800 mb-2">
+                            <i class="fas fa-graduation-cap mr-2"></i>Kemampuan Mengajar:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>✅ Memiliki pengalaman mengajar baca tulis Al-Qur'an</li>
+                            <li>✅ Menguasai metode jilid/iqro (Qira'ati, Tilawati, dll)</li>
+                            <li>✅ Mampu mengajar huruf hijaiyah dan tajwid dasar</li>
+                            <li>✅ Sabar dalam mengajar anak-anak dari berbagai usia</li>
+                            <li>✅ Mampu mengoreksi dan membimbing bacaan santri</li>
+                        </ul>
+                    </div>
 
-                const message = `Assalamu'alaikum TPQ Al Hikmah,
+                    <div class="warning-box">
+                        <h4 class="font-semibold text-orange-800 mb-2">
+                            <i class="fas fa-heart mr-2"></i>Kualitas Personal:
+                        </h4>
+                        <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                            <li>⚡ Memiliki akhlak yang baik dan menjadi teladan</li>
+                            <li>⚡ Sabar, telaten, dan penuh kasih sayang kepada anak-anak</li>
+                            <li>⚡ Mampu berkomunikasi dengan baik dengan orangtua santri</li>
+                            <li>⚡ Siap berkomitmen dan mengikuti sistem TPQ</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mt-4 border-2 border-gray-200">
+                        <label class="flex items-start space-x-3 cursor-pointer">
+                            <input type="checkbox" id="jilidTermsCheckbox" class="mt-1">
+                            <span class="font-semibold text-gray-800">
+                                Saya dengan ini menyatakan bahwa telah memenuhi <strong>SEMUA</strong> 
+                                persyaratan Guru Jilid di atas dan siap mengikuti seluruh proses seleksi 
+                                yang diadakan oleh TPQ Al Hikmah.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            `,
+            width: '650px',
+            focusConfirm: false,
+            confirmButtonText: '<i class="fas fa-check mr-2"></i>Ya, Saya Memenuhi Persyaratan',
+            showCancelButton: true,
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+            confirmButtonColor: CONFIG.colors.success,
+            cancelButtonColor: CONFIG.colors.error,
+            customClass: {
+                container: 'swal-high-zindex'
+            },
+            preConfirm: () => {
+                const checkbox = document.getElementById('jilidTermsCheckbox');
+                if (!checkbox.checked) {
+                    Swal.showValidationMessage('Anda harus menyetujui bahwa telah memenuhi semua persyaratan ini.');
+                    return false;
+                }
+                return true;
+            }
+        });
+        return isConfirmed;
+    }
+    
+    /* =======================================================
+     * LOCATION INQUIRY - SURABAYA BRANCH
+     * ====================================================== */
+    
+    async function handleSurabayaLocationInquiry() {
+        const result = await Swal.fire({
+            title: '📍 Info Lokasi Cabang Surabaya',
+            html: `
+                <div class="text-center space-y-4">
+                    <div class="warning-box">
+                        <div class="flex items-center justify-center mb-2">
+                            <i class="fas fa-info-circle text-orange-600 mr-2"></i>
+                            <span class="font-semibold text-orange-800">Informasi Penting</span>
+                        </div>
+                        <p class="text-orange-700">
+                            Lokasi detail cabang Surabaya belum tersedia untuk umum dan akan 
+                            diinformasikan secara langsung saat konsultasi.
+                        </p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h4 class="font-semibold text-blue-800 mb-3">
+                            <i class="fas fa-map-marked-alt mr-2"></i>Informasi yang Akan Anda Dapatkan:
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Alamat lengkap dan detail</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Panduan rute terbaik</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Akses transportasi umum</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Foto lokasi dan fasilitas</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Jadwal operasional</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check text-green-600 mr-2"></i>
+                                <span>Program yang tersedia</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-green-800 font-medium mb-2">
+                            <i class="fas fa-clock mr-2"></i>Estimasi Waktu Respons: 5-15 menit
+                        </p>
+                        <p class="text-green-700 text-sm">
+                            Tim kami akan segera memberikan informasi lengkap tentang lokasi cabang Surabaya
+                        </p>
+                    </div>
+                </div>
+            `,
+            width: '600px',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fab fa-whatsapp mr-2"></i>Ya, Konsultasi Sekarang',
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+            confirmButtonColor: CONFIG.colors.success,
+            cancelButtonColor: CONFIG.colors.error,
+            customClass: {
+                container: 'swal-high-zindex'
+            }
+        });
 
-Saya ingin *mengajukan pertanyaan/konsultasi*.
+        if (result.isConfirmed) {
+            const message = `Assalamu'alaikum TPQ Al Hikmah,
 
-👤 *Nama:* ${nama}
-❓ *Pertanyaan:* ${pertanyaan}
+Saya ingin mengetahui informasi *lokasi detail cabang Surabaya*.
 
-Mohon bantuan informasi dan penjelasannya.
-Terima kasih atas waktu dan perhatiannya.
+Mohon informasi lengkap mengenai:
+📍 *Alamat lengkap* cabang Surabaya
+🗺️ *Panduan rute* dan akses transportasi terbaik
+📸 *Foto lokasi* dan fasilitas yang tersedia
+⏰ *Jadwal operasional* cabang Surabaya
+📚 *Program pembelajaran* yang tersedia di cabang ini
+🚗 *Fasilitas parkir* dan kemudahan akses
 
-Wassalamu'alaikum warahmatullahi wabarakatuh`;
-
-                openWhatsApp(message);
-                return;
-                
-            case 'kunjungan':
-                const namaKunjungan = await getInput('Nama Lengkap', 'Contoh: Ibu Siti Nurhaliza');
-                if (!namaKunjungan) return;
-                
-                const tujuan = await getInput('Tujuan Kunjungan', 'Contoh: Survey lokasi untuk anak, melihat fasilitas');
-                if (!tujuan) return;
-
-                const messageKunjungan = `Assalamu'alaikum TPQ Al Hikmah,
-
-Saya ingin *mengatur jadwal kunjungan* ke TPQ Al Hikmah.
-
-👤 *Nama:* ${namaKunjungan}
-🎯 *Tujuan Kunjungan:* ${tujuan}
-
-Mohon informasi:
-- Waktu kunjungan yang tersedia
-- Fasilitas yang bisa dilihat
-- Prosedur kunjungan
-
-Terima kasih.
-Wassalamu'alaikum warahmatullahi wabarakatuh`;
-
-                openWhatsApp(messageKunjungan);
-                return;
-                
-            case 'info_biaya':
-                const namaInfo = await getInput('Nama Lengkap', 'Contoh: Bapak Usman Hakim');
-                if (!namaInfo) return;
-
-                const messageInfo = `Assalamu'alaikum TPQ Al Hikmah,
-
-Saya ingin mengetahui *informasi biaya dan paket belajar* di TPQ Al Hikmah.
-
-👤 *Nama:* ${namaInfo}
-
-Mohon informasi detail mengenai:
-- Biaya pendaftaran
-- Biaya bulanan untuk setiap program
-- Paket belajar yang tersedia
-- Sistem pembayaran
-- Potongan harga atau beasiswa yang tersedia
+Saya berencana untuk mengunjungi atau mendaftarkan anak di cabang Surabaya.
 
 Terima kasih atas informasinya.
 Wassalamu'alaikum warahmatullahi wabarakatuh`;
 
-                openWhatsApp(messageInfo);
-                return;
+            openWhatsApp(message);
         }
     }
+    
+    /* =======================================================
+     * MAIN WHATSAPP CONTACT FUNCTION
+     * ====================================================== */
+    
+    async function whatsappContact(action) {
+        try {
+            switch (action) {
+                case 'kelasPrivat':
+                    await showRegistrationForm('privat');
+                    break;
+                    
+                case 'kelasOffline':
+                    await showRegistrationForm('offline');
+                    break;
+                    
+                case 'guruPengajar':
+                    await showTeacherOptions();
+                    break;
+                    
+                case 'hubungi':
+                    await showContactOptions();
+                    break;
+                    
+                case 'infoLokasiSurabaya':
+                    await handleSurabayaLocationInquiry();
+                    break;
+                    
+                case 'testimonial':
+                    const testimonialMessage = `Assalamu'alaikum TPQ Al Hikmah,
 
-    // 5. Testimonial
-    if (action === 'testimonial') {
-        const message = 'Assalamu\'alaikum TPQ Al Hikmah,\n\nSaya ingin melihat *video testimonial* lengkap dari santri dan orangtua TPQ Al Hikmah.\n\nMohon kirimkan link atau video testimonial yang tersedia.\n\nJazakallahu khairan 🙏\nWassalamu\'alaikum warahmatullahi wabarakatuh';
-        openWhatsApp(message);
-        return;
+Saya ingin melihat *video testimonial lengkap* dari santri dan orangtua TPQ Al Hikmah.
+
+Mohon kirimkan:
+🎥 Video testimonial santri dan orangtua
+📸 Foto kegiatan pembelajaran
+📋 Testimoni tertulis jika ada
+🏆 Prestasi santri yang pernah diraih
+
+Saya ingin melihat bukti nyata kualitas pendidikan di TPQ Al Hikmah sebelum mendaftarkan anak.
+
+Jazakallahu khairan 🙏
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+                    
+                    openWhatsApp(testimonialMessage);
+                    break;
+                    
+                default:
+                    console.warn('Unknown action:', action);
+                    break;
+            }
+        } catch (error) {
+            console.error('WhatsApp contact error:', error);
+            
+            await Swal.fire({
+                title: 'Terjadi Kesalahan',
+                text: 'Mohon maaf, terjadi kesalahan sistem. Silakan coba lagi atau hubungi kami secara langsung.',
+                icon: 'error',
+                confirmButtonColor: CONFIG.colors.error,
+                footer: `<a href="https://wa.me/${CONFIG.whatsappNumber}" target="_blank" style="color: #25D366;">
+                    <i class="fab fa-whatsapp mr-1"></i>Hubungi via WhatsApp Langsung
+                </a>`
+            });
+        }
     }
-
-    // 6. Info Lokasi Surabaya - NEW FEATURE
-    if (action === 'infoLokasiSurabaya') {
-        debugLog('Processing Surabaya location inquiry');
-        
-        const nama = await getInput('Nama Lengkap', 'Contoh: Ibu Siti Khadijah');
-        if (!nama) return;
-        
-        const keperluan = await Swal.fire({
-            title: 'Keperluan Anda',
-            text: 'Apa yang ingin Anda ketahui tentang cabang Surabaya?',
+    
+    /* =======================================================
+     * CONTACT OPTIONS MENU
+     * ====================================================== */
+    
+    async function showContactOptions() {
+        const type = await Swal.fire({
+            title: '📞 Pilih Jenis Layanan',
+            text: 'Apa yang ingin Anda lakukan hari ini?',
             input: 'select',
             inputOptions: {
-                'alamat': 'Alamat lengkap cabang Surabaya',
-                'daftar': 'Mendaftar santri di cabang Surabaya',
-                'kunjungan': 'Jadwal kunjungan ke lokasi',
-                'progress': 'Update progress pembukaan cabang',
-                'fasilitas': 'Detail fasilitas yang tersedia'
+                'daftar': '📝 Mendaftar Santri Baru',
+                'bertanya': '❓ Bertanya / Konsultasi Umum',
+                'guru': '👨‍🏫 Daftar Sebagai Guru Pengajar',
+                'kunjungan': '🏢 Jadwal Kunjungan ke TPQ',
+                'info_biaya': '💰 Info Biaya & Paket Belajar',
+                'program': '📚 Info Program Pembelajaran',
+                'fasilitas': '🏗️ Info Fasilitas TPQ',
+                'prestasi': '🏆 Info Prestasi Santri'
             },
-            inputPlaceholder: 'Pilih keperluan Anda',
+            inputPlaceholder: 'Silakan pilih layanan yang Anda butuhkan...',
             showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-arrow-right mr-2"></i>Lanjutkan',
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
             confirmButtonColor: CONFIG.colors.primary,
             cancelButtonColor: CONFIG.colors.error,
-            inputValidator: v => v ? null : 'Pilih salah satu keperluan!'
+            width: '500px',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Silakan pilih salah satu layanan yang tersedia!';
+                }
+            },
+            customClass: {
+                container: 'swal-high-zindex'
+            }
         });
         
-        if (!keperluan.isConfirmed) {
-            await Swal.fire({
-                title: 'Dibatalkan',
-                text: 'Konsultasi dibatalkan.',
-                icon: 'info',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            return;
-        }
+        if (!type.isConfirmed) return;
         
-        const keperluanText = {
-            'alamat': 'alamat lengkap cabang Surabaya',
-            'daftar': 'mendaftar santri di cabang Surabaya',
-            'kunjungan': 'mengatur jadwal kunjungan ke lokasi',
-            'progress': 'update progress pembukaan cabang',
-            'fasilitas': 'detail fasilitas yang tersedia'
-        };
+        switch (type.value) {
+            case 'daftar':
+                await showRegistrationForm();
+                break;
+                
+            case 'guru':
+                await showTeacherOptions();
+                break;
+                
+            case 'bertanya':
+                await handleGeneralInquiry();
+                break;
+                
+            case 'kunjungan':
+                await handleVisitRequest();
+                break;
+                
+            case 'info_biaya':
+                await handlePriceInquiry();
+                break;
+                
+            case 'program':
+                await handleProgramInquiry();
+                break;
+                
+            case 'fasilitas':
+                await handleFacilityInquiry();
+                break;
+                
+            case 'prestasi':
+                await handleAchievementInquiry();
+                break;
+        }
+    }
+    
+    /* =======================================================
+     * INQUIRY HANDLERS
+     * ====================================================== */
+    
+    async function handleGeneralInquiry() {
+        const nama = await getInput('Nama Lengkap Anda', 'Contoh: Bapak Ahmad Wijaya');
+        if (!nama) return;
+        
+        const pertanyaan = await getInput('Pertanyaan / Konsultasi Anda', 'Tulis pertanyaan atau hal yang ingin dikonsultasikan...', 'textarea');
+        if (!pertanyaan) return;
 
-        const messageLokasiSurabaya = `*🏢 KONSULTASI CABANG SURABAYA TPQ AL HIKMAH*
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
 
-Assalamu'alaikum warahmatullahi wabarakatuh,
+Saya ingin *mengajukan pertanyaan/konsultasi*.
 
-Saya ingin mendapatkan informasi tentang *cabang Surabaya* TPQ Al Hikmah.
-
-*📋 DATA KONSULTAN:*
 👤 *Nama:* ${nama}
-📞 *Keperluan:* Informasi ${keperluanText[keperluan.value]}
+❓ *Pertanyaan/Konsultasi:*
+${pertanyaan}
 
-*❓ INFORMASI YANG DIBUTUHKAN:*
-• Alamat lengkap cabang Surabaya
-• Jadwal pembukaan resmi
-• Proses pendaftaran santri
-• Fasilitas yang tersedia
-• Jadwal kunjungan lokasi
-• Program pembelajaran yang ditawarkan
+Mohon bantuan informasi dan penjelasan dari tim TPQ Al Hikmah.
+Terima kasih atas waktu dan perhatiannya.
 
-Mohon informasi lengkap mengenai cabang Surabaya ini.
-Terima kasih atas waktu dan informasinya.
-
-Jazakallahu khairan kathiran 🙏
 Wassalamu'alaikum warahmatullahi wabarakatuh`;
 
-        openWhatsApp(messageLokasiSurabaya);
-        return;
+        openWhatsApp(message);
     }
-
-    // Fallback for unknown action
-    debugLog('Unknown action received:', action);
-    await Swal.fire({
-        title: 'Error',
-        text: 'Aksi tidak dikenal. Silakan coba lagi.',
-        icon: 'error',
-        confirmButtonColor: CONFIG.colors.error
-    });
-}
-
-/* =======================================================
- * MODAL REGISTRATION FORM - FIXED HTML
- * ====================================================== */
-
-function showRegistrationForm(preselectedClass = '') {
-    debugLog('Showing registration form modal', { preselectedClass });
     
-    const kelasOptions = preselectedClass === 'privat' ? 
-        '<option value="privat" selected>Kelas Privat (1-on-1)</option><option value="offline">Kelas Offline (Kelompok)</option>' :
-        preselectedClass === 'offline' ?
-        '<option value="offline" selected>Kelas Offline (Kelompok)</option><option value="privat">Kelas Privat (1-on-1)</option>' :
-        '<option value="">Pilih Jenis Kelas</option><option value="privat">Kelas Privat (1-on-1)</option><option value="offline">Kelas Offline (Kelompok)</option>';
+    async function handleVisitRequest() {
+        const nama = await getInput('Nama Lengkap', 'Contoh: Ibu Siti Nurhaliza');
+        if (!nama) return;
+        
+        const tujuan = await getInput('Tujuan Kunjungan', 'Contoh: Survey lokasi untuk anak, melihat fasilitas pembelajaran, bertemu dengan pengajar');
+        if (!tujuan) return;
 
-    Swal.fire({
-        title: '📝 Form Pendaftaran Santri TPQ Al Hikmah',
-        html: `
-            <div class="text-left max-h-[70vh] overflow-y-auto">
-                <form id="modalRegistrationForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nama Lengkap Anak <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="modal-namaAnak" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                placeholder="Contoh: Ahmad Zaki Mubarak"
-                                required>
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin *mengatur jadwal kunjungan* ke TPQ Al Hikmah.
+
+👤 *Nama:* ${nama}
+🎯 *Tujuan Kunjungan:* ${tujuan}
+
+Mohon informasi mengenai:
+⏰ Waktu kunjungan yang tersedia
+📋 Fasilitas yang bisa dilihat saat kunjungan
+👥 Apakah bisa bertemu dengan pengajar/pengelola
+📝 Prosedur kunjungan yang harus diikuti
+🚗 Info parkir dan akses lokasi
+
+Terima kasih.
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+        openWhatsApp(message);
+    }
+    
+    async function handlePriceInquiry() {
+        const nama = await getInput('Nama Lengkap', 'Contoh: Bapak Usman Hakim');
+        if (!nama) return;
+
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin mengetahui *informasi biaya dan paket belajar* di TPQ Al Hikmah.
+
+👤 *Nama:* ${nama}
+
+Mohon informasi detail mengenai:
+💰 *Biaya pendaftaran* untuk santri baru
+💵 *Biaya bulanan* untuk setiap program (Jilid, Tahfidz, Madrasah Diniyah)
+📦 *Paket belajar* yang tersedia (privat vs offline)
+💳 *Sistem pembayaran* yang diterima
+🎓 *Potongan harga* atau program beasiswa yang tersedia
+📚 Biaya buku dan materi pembelajaran
+🏢 Perbedaan biaya antar lokasi (Sidoarjo vs Surabaya)
+
+Terima kasih atas informasinya.
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+        openWhatsApp(message);
+    }
+    
+    async function handleProgramInquiry() {
+        const nama = await getInput('Nama Lengkap', 'Contoh: Ibu Aisyah Rahmawati');
+        if (!nama) return;
+
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin mengetahui *informasi lengkap program pembelajaran* di TPQ Al Hikmah.
+
+👤 *Nama:* ${nama}
+
+Mohon informasi detail mengenai:
+📖 *Program Jilid/Iqro* - metode dan durasi pembelajaran
+🕌 *Program Tahfidz* - target hafalan dan metode yang digunakan
+📚 *Program Madrasah Diniyah* - mata pelajaran yang diajarkan
+⏰ *Jadwal pembelajaran* untuk masing-masing program
+👥 *Sistem kelas* (privat vs kelompok) dan jumlah santri per kelas
+📋 *Kurikulum dan materi* yang digunakan
+🎯 *Target pencapaian* untuk setiap program
+📊 *Sistem evaluasi* dan laporan perkembangan santri
+
+Terima kasih atas informasinya.
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+        openWhatsApp(message);
+    }
+    
+    async function handleFacilityInquiry() {
+        const nama = await getInput('Nama Lengkap', 'Contoh: Bapak Ridwan Kamil');
+        if (!nama) return;
+
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin mengetahui *informasi fasilitas* yang tersedia di TPQ Al Hikmah.
+
+👤 *Nama:* ${nama}
+
+Mohon informasi mengenai:
+🏢 *Fasilitas gedung* dan ruang kelas
+🌡️ *Kenyamanan ruangan* (AC, ventilasi, pencahayaan)
+📚 *Perpustakaan* dan koleksi buku yang tersedia
+🕌 *Mushola/tempat ibadah* untuk santri
+🚗 *Fasilitas parkir* untuk orangtua
+🧽 *Kebersihan dan sanitasi* lingkungan TPQ
+🔒 *Keamanan* dan sistem pengawasan
+📱 *Fasilitas teknologi* (proyektor, sound system, dll)
+🎮 *Area bermain* atau ruang santai untuk anak
+☕ *Kantin atau area makan* jika ada
+
+Terima kasih atas informasinya.
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+        openWhatsApp(message);
+    }
+    
+    async function handleAchievementInquiry() {
+        const nama = await getInput('Nama Lengkap', 'Contoh: Ibu Dewi Sartika');
+        if (!nama) return;
+
+        const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin mengetahui *informasi prestasi santri* TPQ Al Hikmah.
+
+👤 *Nama:* ${nama}
+
+Mohon informasi mengenai:
+🏆 *Prestasi santri* dalam kompetisi tilawah/tahfidz
+📈 *Statistik kelulusan* santri per program
+⭐ *Success story* santri alumni TPQ
+🎖️ *Penghargaan* yang pernah diterima TPQ
+📊 *Tingkat kepuasan* orangtua santri
+💯 *Persentase santri* yang berhasil khatam Al-Qur'an
+🎯 *Rata-rata waktu* penyelesaian program tahfidz
+📰 *Liputan media* atau pengakuan dari pihak lain
+
+Informasi ini akan membantu saya dalam mempertimbangkan TPQ Al Hikmah untuk anak saya.
+
+Terima kasih atas informasinya.
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+        openWhatsApp(message);
+    }
+    
+    /* =======================================================
+     * REGISTRATION FORM SYSTEM
+     * ====================================================== */
+    
+    async function showRegistrationForm(preselectedClass = '') {
+        const kelasOptions = preselectedClass === 'privat' ? 
+            '<option value="privat" selected>Kelas Privat (1-on-1 dengan ustadz)</option><option value="offline">Kelas Offline (Kelompok maksimal 8 santri)</option>' :
+            preselectedClass === 'offline' ?
+            '<option value="offline" selected>Kelas Offline (Kelompok maksimal 8 santri)</option><option value="privat">Kelas Privat (1-on-1 dengan ustadz)</option>' :
+            '<option value="">Pilih Jenis Kelas</option><option value="privat">Kelas Privat (1-on-1 dengan ustadz)</option><option value="offline">Kelas Offline (Kelompok maksimal 8 santri)</option>';
+
+        const result = await Swal.fire({
+            title: '📝 Form Pendaftaran Santri TPQ Al Hikmah',
+            html: `
+                <div class="text-left max-h-[75vh] overflow-y-auto">
+                    <div class="space-y-4 p-2">
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-user mr-2 text-blue-600"></i>Nama Lengkap Anak <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="modal-namaAnak" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                    placeholder="Contoh: Ahmad Zaki Mubarak"
+                                    required>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-birthday-cake mr-2 text-pink-600"></i>Usia Anak <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="modal-usiaAnak" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                        required>
+                                        <option value="">Pilih Usia</option>
+                                        <option value="4-6">4-6 tahun (Pra TK - TK)</option>
+                                        <option value="7-10">7-10 tahun (SD Kelas 1-4)</option>
+                                        <option value="11-15">11-15 tahun (SD Kelas 5 - SMP)</option>
+                                        <option value="16+">16+ tahun (SMA ke atas)</option>
+                                        <option value="dewasa">Dewasa</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-venus-mars mr-2 text-purple-600"></i>Jenis Kelamin <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="modal-jenisKelamin" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                        required>
+                                        <option value="">Pilih Jenis Kelamin</option>
+                                        <option value="laki-laki">Laki-laki</option>
+                                        <option value="perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-users mr-2 text-green-600"></i>Nama Orangtua/Wali <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="modal-namaOrtu" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                    placeholder="Contoh: Bapak Ahmad Susanto / Ibu Siti Fatimah"
+                                    required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fab fa-whatsapp mr-2 text-green-600"></i>No. WhatsApp <span class="text-red-500">*</span>
+                                </label>
+                                <input type="tel" id="modal-nomorWA" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                    placeholder="Contoh: 081234567890 atau +6281234567890"
+                                    required>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-chalkboard mr-2 text-blue-600"></i>Pilih Kelas <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="modal-jenisKelas" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                        required>
+                                        ${kelasOptions}
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-map-marker-alt mr-2 text-red-600"></i>Pilih Lokasi <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="modal-lokasi" 
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200"
+                                        required>
+                                        <option value="">Pilih Lokasi TPQ</option>
+                                        <option value="sidoarjo">Sidoarjo (Pusat) - Jl. Kemiri</option>
+                                        <option value="surabaya">Surabaya (Cabang) - Segera Dibuka Juli 2025</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-book-reader mr-2 text-indigo-600"></i>Pengalaman Mengaji Anak
+                                </label>
+                                <select id="modal-pengalaman" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200">
+                                    <option value="">Pilih Pengalaman Mengaji</option>
+                                    <option value="belum">Belum pernah belajar mengaji sama sekali</option>
+                                    <option value="dasar">Sudah mengenal huruf hijaiyah dasar</option>
+                                    <option value="lancar">Sudah lancar membaca Al-Qur'an</option>
+                                    <option value="hafal">Sudah hafal beberapa surat pendek</option>
+                                    <option value="tahfidz">Sudah menghafal lebih dari 5 juz</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-target mr-2 text-orange-600"></i>Target Pembelajaran
+                                </label>
+                                <select id="modal-target" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200">
+                                    <option value="">Pilih Target Pembelajaran</option>
+                                    <option value="baca-tulis">Belajar baca tulis Al-Qur'an dari dasar</option>
+                                    <option value="lancar">Lancar membaca Al-Qur'an dengan tajwid</option>
+                                    <option value="khatam">Khatam Al-Qur'an 30 juz</option>
+                                    <option value="tahfidz">Menghafal Al-Qur'an (tahfidz)</option>
+                                    <option value="diniyah">Belajar ilmu agama (madrasah diniyah)</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-sticky-note mr-2 text-gray-600"></i>Catatan Tambahan
+                                </label>
+                                <textarea id="modal-catatan" rows="4" 
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition duration-200 resize-none"
+                                    placeholder="Kondisi khusus anak, jadwal yang diinginkan, alergi, atau informasi penting lainnya..."></textarea>
+                            </div>
                         </div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Usia Anak <span class="text-red-500">*</span>
-                            </label>
-                            <select id="modal-usiaAnak" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                required>
-                                <option value="">Pilih Usia</option>
-                                <option value="4-6">4-6 tahun</option>
-                                <option value="7-10">7-10 tahun</option>
-                                <option value="11-15">11-15 tahun</option>
-                                <option value="16+">16+ tahun</option>
-                                <option value="dewasa">Dewasa</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nama Orangtua/Wali <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="modal-namaOrtu" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                placeholder="Contoh: Bapak Ahmad Susanto"
-                                required>
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                No. WhatsApp <span class="text-red-500">*</span>
-                            </label>
-                            <input type="tel" id="modal-nomorWA" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                placeholder="Contoh: 081234567890 atau +6281234567890"
-                                required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Pilih Kelas <span class="text-red-500">*</span>
-                            </label>
-                            <select id="modal-jenisKelas" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                required>
-                                ${kelasOptions}
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Pilih Lokasi <span class="text-red-500">*</span>
-                            </label>
-                            <select id="modal-lokasi" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition"
-                                required>
-                                <option value="">Pilih Lokasi</option>
-                                <option value="sidoarjo">Sidoarjo (Pusat)</option>
-                                <option value="surabaya">Surabaya (Cabang)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Pengalaman Mengaji Anak
-                            </label>
-                            <select id="modal-pengalaman" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition">
-                                <option value="">Pilih Pengalaman</option>
-                                <option value="belum">Belum pernah belajar mengaji</option>
-                                <option value="dasar">Sudah bisa hijaiyah dasar</option>
-                                <option value="lancar">Sudah lancar membaca Al-Qur'an</option>
-                                <option value="hafal">Sudah hafal beberapa surat</option>
-                                <option value="tahfidz">Sudah menghafal lebih dari 5 juz</option>
-                            </select>
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Catatan Tambahan
-                            </label>
-                            <textarea id="modal-catatan" rows="4" 
-                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition resize-none"
-                                placeholder="Kondisi khusus anak, target pembelajaran, jadwal yang diinginkan, atau informasi lainnya..."></textarea>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                            <h5 class="font-semibold text-blue-800 mb-2">
+                                <i class="fas fa-info-circle mr-2"></i>Informasi Penting:
+                            </h5>
+                            <ul class="text-sm text-blue-700 space-y-1">
+                                <li>• Data yang Anda berikan akan dirahasiakan dan hanya digunakan untuk keperluan pendaftaran</li>
+                                <li>• Tim TPQ Al Hikmah akan menghubungi Anda dalam 1x24 jam untuk konfirmasi</li>
+                                <li>• Proses pendaftaran resmi akan dilakukan setelah konsultasi awal</li>
+                            </ul>
                         </div>
                     </div>
-                </form>
-                <div class="bg-gray-50 p-4 rounded-lg mt-4 text-xs text-gray-600">
-                    <strong>📋 Catatan:</strong><br>
-                    • Fields dengan tanda <span class="text-red-500">*</span> wajib diisi<br>
-                    • Data akan dikirim langsung ke WhatsApp TPQ Al Hikmah<br>
-                    • Tim kami akan menghubungi Anda dalam 24 jam
                 </div>
-            </div>
-        `,
-        width: '700px',
-        showCancelButton: true,
-        confirmButtonText: '<i class="fab fa-whatsapp mr-2"></i>Kirim via WhatsApp',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: CONFIG.colors.success,
-        cancelButtonColor: CONFIG.colors.error,
-        focusConfirm: false,
-        preConfirm: () => {
-            // Validate required fields
-            const requiredFields = ['modal-namaAnak', 'modal-usiaAnak', 'modal-namaOrtu', 'modal-nomorWA', 'modal-jenisKelas', 'modal-lokasi'];
-            let isValid = true;
-            const missingFields = [];
-            
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    if (!field.value.trim()) {
+            `,
+            width: '750px',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fab fa-whatsapp mr-2"></i>Kirim Pendaftaran via WhatsApp',
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+            confirmButtonColor: CONFIG.colors.success,
+            cancelButtonColor: CONFIG.colors.error,
+            focusConfirm: false,
+            customClass: {
+                container: 'swal-high-zindex'
+            },
+            preConfirm: () => {
+                const requiredFields = ['modal-namaAnak', 'modal-usiaAnak', 'modal-jenisKelamin', 'modal-namaOrtu', 'modal-nomorWA', 'modal-jenisKelas', 'modal-lokasi'];
+                
+                // Reset all field styles first
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.style.borderColor = '#d1d5db';
+                        field.style.boxShadow = 'none';
+                    }
+                });
+                
+                // Validate required fields
+                const missingFields = [];
+                for (const fieldId of requiredFields) {
+                    const field = document.getElementById(fieldId);
+                    if (!field?.value.trim()) {
                         field.style.borderColor = '#ef4444';
                         field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                        missingFields.push(field.previousElementSibling.textContent.replace(' *', ''));
-                        isValid = false;
-                    } else {
-                        field.style.borderColor = '#10b981';
-                        field.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+                        missingFields.push(field.previousElementSibling.textContent.replace(' *', '').replace(/^.*\s/, ''));
                     }
                 }
-            });
-            
-            if (!isValid) {
-                Swal.showValidationMessage(`Mohon lengkapi field: ${missingFields.join(', ')}`);
-                return false;
+                
+                if (missingFields.length > 0) {
+                    Swal.showValidationMessage(`Mohon lengkapi field berikut: ${missingFields.join(', ')}`);
+                    return false;
+                }
+                
+                // Validate WhatsApp number
+                const nomorWA = document.getElementById('modal-nomorWA').value;
+                if (!validateWhatsAppNumber(nomorWA)) {
+                    document.getElementById('modal-nomorWA').style.borderColor = '#ef4444';
+                    document.getElementById('modal-nomorWA').style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                    Swal.showValidationMessage('Format nomor WhatsApp tidak valid. Contoh yang benar: 081234567890');
+                    return false;
+                }
+                
+                return {
+                    namaAnak: document.getElementById('modal-namaAnak').value.trim(),
+                    usiaAnak: document.getElementById('modal-usiaAnak').value,
+                    jenisKelamin: document.getElementById('modal-jenisKelamin').value,
+                    namaOrtu: document.getElementById('modal-namaOrtu').value.trim(),
+                    nomorWA: nomorWA.trim(),
+                    jenisKelas: document.getElementById('modal-jenisKelas').value,
+                    lokasi: document.getElementById('modal-lokasi').value,
+                    pengalaman: document.getElementById('modal-pengalaman').value || 'Tidak disebutkan',
+                    target: document.getElementById('modal-target').value || 'Akan ditentukan saat konsultasi',
+                    catatan: document.getElementById('modal-catatan').value.trim() || 'Tidak ada catatan khusus'
+                };
             }
-            
-            // Validate WhatsApp number
-            const nomorWA = document.getElementById('modal-nomorWA').value;
-            if (!validateWhatsAppNumber(nomorWA)) {
-                document.getElementById('modal-nomorWA').style.borderColor = '#ef4444';
-                Swal.showValidationMessage('Format nomor WhatsApp tidak valid. Contoh: 081234567890');
-                return false;
-            }
-            
-            return {
-                namaAnak: document.getElementById('modal-namaAnak').value.trim(),
-                usiaAnak: document.getElementById('modal-usiaAnak').value,
-                namaOrtu: document.getElementById('modal-namaOrtu').value.trim(),
-                nomorWA: nomorWA.trim(),
-                jenisKelas: document.getElementById('modal-jenisKelas').value,
-                lokasi: document.getElementById('modal-lokasi').value,
-                pengalaman: document.getElementById('modal-pengalaman').value || 'Tidak disebutkan',
-                catatan: document.getElementById('modal-catatan').value.trim() || 'Tidak ada catatan khusus'
-            };
-        }
-    }).then((result) => {
+        });
+        
         if (result.isConfirmed && result.value) {
-            debugLog('Modal form submitted', result.value);
-            sendRegistrationToWhatsApp(result.value);
+            await sendRegistrationToWhatsApp(result.value);
         }
-    });
-}
-
-/* =======================================================
- * SEND REGISTRATION TO WHATSAPP
- * ====================================================== */
-
-function sendRegistrationToWhatsApp(formData) {
-    debugLog('Sending registration to WhatsApp', formData);
+    }
     
-    const kelasText = formData.jenisKelas === 'privat' ? 'Kelas Privat (1-on-1)' : 'Kelas Offline (Kelompok)';
-    const lokasiText = formData.lokasi === 'sidoarjo' ? 'Sidoarjo (Pusat)' : 'Surabaya (Cabang)';
-    
-    const message = `*🕌 PENDAFTARAN TPQ AL HIKMAH*
+    async function sendRegistrationToWhatsApp(formData) {
+        const kelasText = formData.jenisKelas === 'privat' ? 
+            'Kelas Privat (1-on-1 dengan ustadz)' : 
+            'Kelas Offline (Kelompok maksimal 8 santri)';
+        
+        const lokasiText = formData.lokasi === 'sidoarjo' ? 
+            'Sidoarjo (Pusat) - Jl. Kemiri' : 
+            'Surabaya (Cabang) - Segera Dibuka Juli 2025';
+        
+        const message = `*🕌 PENDAFTARAN SANTRI TPQ AL HIKMAH*
 
-*📋 DATA CALON SANTRI:*
+*📋 DATA LENGKAP CALON SANTRI:*
 👦 *Nama Anak:* ${formData.namaAnak}
-📅 *Usia:* ${formData.usiaAnak} tahun
+📅 *Usia:* ${formData.usiaAnak}
+⚥ *Jenis Kelamin:* ${formData.jenisKelamin}
 👨‍👩‍👧‍👦 *Nama Orangtua:* ${formData.namaOrtu}
 📱 *No. WhatsApp:* ${formData.nomorWA}
 
 *📚 PILIHAN PROGRAM:*
 🎓 *Jenis Kelas:* ${kelasText}
-📍 *Lokasi:* ${lokasiText}
+📍 *Lokasi TPQ:* ${lokasiText}
 📖 *Pengalaman Mengaji:* ${formData.pengalaman}
+🎯 *Target Pembelajaran:* ${formData.target}
 
 *📝 CATATAN TAMBAHAN:*
 ${formData.catatan}
 
-━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Assalamu'alaikum warahmatullahi wabarakatuh,
 
 Saya bermaksud untuk *mendaftarkan putra/putri* saya di TPQ Al Hikmah sesuai data di atas.
 
 Mohon informasi lebih lanjut mengenai:
-✅ Jadwal belajar yang tersedia
-✅ Biaya pendaftaran dan bulanan
-✅ Proses seleksi (jika ada)
-✅ Materi pembelajaran
-✅ Jadwal trial class GRATIS
+• Proses pendaftaran selanjutnya
+• Jadwal belajar yang tersedia
+• Biaya pendaftaran dan bulanan
+• Kapan anak bisa mulai belajar
+• Persyaratan dokumen yang perlu disiapkan
 
 Terima kasih atas perhatian dan pelayanannya.
-
 Jazakallahu khairan kathiran 🙏
+
 Wassalamu'alaikum warahmatullahi wabarakatuh`;
 
-    try {
         openWhatsApp(message);
         
         // Show success feedback
-        setTimeout(() => {
-            Swal.fire({
+        setTimeout(async () => {
+            await Swal.fire({
                 icon: 'success',
                 title: 'Pendaftaran Berhasil Dikirim!',
                 html: `
-                    <div class="text-left">
-                        <p class="font-semibold mb-4">✅ Data pendaftaran telah dikirim ke WhatsApp TPQ Al Hikmah</p>
-                        
-                        <p class="font-semibold mb-2">📞 Selanjutnya:</p>
-                        <ul class="list-disc ml-5 mb-4">
-                            <li>Tim kami akan menghubungi Anda dalam 24 jam</li>
-                            <li>Anda akan mendapat informasi detail program</li>
-                            <li>Jadwal trial class GRATIS akan diatur</li>
-                            <li>Konsultasi gratis dengan ustadz/ustadzah</li>
-                        </ul>
-                        
-                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                            <p class="font-semibold">💡 Tips:</p>
-                            <p>Siapkan pertanyaan Anda untuk sesi konsultasi nanti!</p>
+                    <div class="text-center space-y-3">
+                        <p class="text-gray-700">Data pendaftaran telah dikirim ke WhatsApp TPQ Al Hikmah</p>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <p class="text-green-800 font-medium">
+                                <i class="fas fa-clock mr-2"></i>Tim kami akan menghubungi Anda dalam 1x24 jam
+                            </p>
                         </div>
                     </div>
                 `,
-                confirmButtonText: 'Baik, Terima Kasih!',
-                confirmButtonColor: CONFIG.colors.success,
-                width: '500px'
+                timer: 4000,
+                showConfirmButton: false
             });
-        }, 2000);
+        }, 1000);
+    }
+    
+    /* =======================================================
+     * ADDITIONAL UTILITY FUNCTIONS
+     * ====================================================== */
+    
+    function toggleFAQ(faqId) {
+        const content = document.getElementById(faqId);
+        const icon = document.getElementById(faqId + '-icon');
         
-    } catch (error) {
-        debugLog('Error sending registration', error);
+        if (!content || !icon) return;
         
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal Mengirim Pendaftaran',
-            html: `
-                <p>Maaf, terjadi kesalahan saat mengirim data pendaftaran.</p>
-                <br>
-                <p><strong>Silakan hubungi langsung:</strong></p>
-                <p>📱 WhatsApp: <a href="https://wa.me/6285183279603" target="_blank" class="text-green-600">+62 851-8327-9603</a></p>
-                <br>
-                <p>Atau salin pesan berikut dan kirim manual:</p>
-                <textarea readonly class="w-full h-32 mt-2 p-2 border rounded text-xs">${message}</textarea>
-            `,
-            confirmButtonText: 'OK',
-            confirmButtonColor: CONFIG.colors.primary,
-            width: '600px'
-        });
-    }
-}
-
-/* =======================================================
- * ADDITIONAL FUNCTIONS
- * ====================================================== */
-
-// Toggle FAQ function
-function toggleFAQ(faqId) {
-    debugLog('Toggling FAQ:', faqId);
-    
-    const content = document.getElementById(faqId);
-    const icon = document.getElementById(faqId + '-icon');
-    
-    if (!content || !icon) {
-        debugLog('FAQ elements not found', { content, icon });
-        return;
-    }
-    
-    if (content.classList.contains('expanded')) {
-        content.classList.remove('expanded');
-        icon.classList.remove('rotate-180');
-    } else {
-        // Close all other FAQs
-        document.querySelectorAll('.expandable-content').forEach(item => {
-            item.classList.remove('expanded');
-        });
-        document.querySelectorAll('[id$="-icon"]').forEach(item => {
-            item.classList.remove('rotate-180');
-        });
-        
-        // Open clicked FAQ
-        content.classList.add('expanded');
-        icon.classList.add('rotate-180');
-    }
-}
-
-// Video player function
-function playVideo(videoId) {
-    debugLog('Playing video:', videoId);
-    
-    const videoData = {
-        video1: {
-            title: 'Testimonial Ibu Sari',
-            subtitle: 'Orangtua Santri Kelas Privat',
-            description: 'Testimoni tentang perkembangan belajar mengaji anak'
-        },
-        video2: {
-            title: 'Testimonial Santri Alumni', 
-            subtitle: 'Program Tahfidz Al-Qur\'an',
-            description: 'Cerita perjalanan menghafal Al-Qur\'an di TPQ Al Hikmah'
-        }
-    };
-    
-    const video = videoData[videoId] || videoData.video1;
-    
-    Swal.fire({
-        title: '🎥 ' + video.title,
-        html: `
-            <div class="text-center">
-                <div class="bg-gradient-to-br from-blue-400 to-purple-600 h-64 rounded-xl flex items-center justify-center mb-4 relative overflow-hidden">
-                    <div class="text-center text-white z-10">
-                        <i class="fas fa-play-circle text-6xl mb-4 opacity-90 cursor-pointer hover:opacity-100 hover:scale-110 transition-all"></i>
-                        <h3 class="font-bold text-lg">${video.subtitle}</h3>
-                        <p class="opacity-80 text-sm mt-2">${video.description}</p>
-                    </div>
-                    <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg text-left">
-                    <h4 class="font-semibold mb-3">🎯 Video Testimonial Tersedia:</h4>
-                    <ul class="list-disc ml-5 text-gray-700">
-                        <li>Testimonial orangtua santri</li>
-                        <li>Cerita sukses program tahfidz</li> 
-                        <li>Review metode pembelajaran</li>
-                        <li>Progress santri dari nol hingga lancar</li>
-                    </ul>
-                </div>
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: '<i class="fab fa-youtube mr-2"></i>Tonton di YouTube',
-        cancelButtonText: 'Minta Video via WhatsApp',
-        confirmButtonColor: '#ff0000',
-        cancelButtonColor: CONFIG.colors.success,
-        width: '500px'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.open('https://youtube.com/@tpqalhikmah', '_blank');
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            whatsappContact('testimonial');
-        }
-    });
-}
-
-// Maps function for Sidoarjo location
-function openMaps(location) {
-    debugLog('Opening maps for location:', location);
-    
-    if (location === 'sidoarjo') {
-        // Replace with actual coordinates or address
-        const mapsUrl = 'https://maps.google.com/maps?q=Jl.+Kemiri+No.+123,+Kemiri,+Sidoarjo,+Jawa+Timur';
-        window.open(mapsUrl, '_blank');
-    } else {
-        debugLog('Unknown location for maps:', location);
-    }
-}
-
-// Social media functions
-function openInstagram() {
-    debugLog('Opening Instagram');
-    window.open('https://instagram.com/tpqalhikmah', '_blank');
-}
-
-function openTikTok() {
-    debugLog('Opening TikTok');
-    window.open('https://www.tiktok.com/@tpqalhikmah', '_blank');
-}
-
-function openYouTube() {
-    debugLog('Opening YouTube');
-    window.open('https://youtube.com/@tpqalhikmah', '_blank');
-}
-
-function openFacebook() {
-    debugLog('Opening Facebook');
-    window.open('https://facebook.com/tpqalhikmah', '_blank');
-}
-
-/* =======================================================
- * NAVIGATION AND UI FUNCTIONS
- * ====================================================== */
-
-// Scroll to specific section
-function scrollToSection(sectionId) {
-    debugLog('Scrolling to section:', sectionId);
-    
-    const element = document.getElementById(sectionId);
-    if (element) {
-        element.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
-}
-
-// Scroll to specific class in classes section
-function scrollToSpecificClass(classType) {
-    debugLog('Scrolling to specific class:', classType);
-    
-    // First scroll to classes section
-    scrollToSection('classes');
-    
-    // Then trigger the appropriate action after a short delay
-    setTimeout(() => {
-        if (classType === 'privat') {
-            whatsappContact('kelasPrivat');
-        } else if (classType === 'offline') {
-            whatsappContact('kelasOffline');
-        }
-    }, 1000);
-}
-
-// Scroll to programs section
-function scrollToPrograms() {
-    debugLog('Scrolling to programs section');
-    scrollToSection('programs');
-}
-
-// Toggle details for class cards
-function toggleDetails(classType) {
-    debugLog('Toggling details for class:', classType);
-    
-    const content = document.getElementById(classType + '-extra');
-    const button = document.getElementById('btn-' + classType);
-    const icon = button.querySelector('i.fa-chevron-down');
-    
-    if (content && button) {
         if (content.classList.contains('expanded')) {
             content.classList.remove('expanded');
-            button.querySelector('.btn-text').textContent = 'Lihat Lebih Banyak';
-            icon.style.transform = 'rotate(0deg)';
+            icon.classList.remove('rotate-180');
         } else {
+            // Close all other FAQs
+            document.querySelectorAll('.expandable-content').forEach(item => {
+                item.classList.remove('expanded');
+            });
+            document.querySelectorAll('[id$="-icon"]').forEach(item => {
+                item.classList.remove('rotate-180');
+            });
+            
+            // Open clicked FAQ
             content.classList.add('expanded');
-            button.querySelector('.btn-text').textContent = 'Lihat Lebih Sedikit';
-            icon.style.transform = 'rotate(180deg)';
+            icon.classList.add('rotate-180');
         }
     }
-}
-
-/* =======================================================
- * INITIALIZATION & ERROR HANDLING
- * ====================================================== */
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    debugLog('TPQ Al Hikmah Contact System Initialized');
     
-    // Check for required dependencies
-    if (typeof Swal === 'undefined') {
-        console.error('[TPQ] SweetAlert2 library not found. Please include SweetAlert2.');
-        return;
+    async function playVideo(videoId) {
+        const videoData = {
+            video1: {
+                title: 'Testimonial Ibu Sari - Kelas Privat',
+                description: 'Testimoni orangtua tentang perkembangan belajar mengaji anak di kelas privat'
+            },
+            video2: {
+                title: 'Testimonial Alumni Program Tahfidz', 
+                description: 'Cerita perjalanan menghafal Al-Qur\'an santri TPQ Al Hikmah'
+            },
+            video3: {
+                title: 'Suasana Pembelajaran Kelas Offline',
+                description: 'Dokumentasi kegiatan belajar mengajar di kelas offline TPQ Al Hikmah'
+            }
+        };
+        
+        const video = videoData[videoId] || videoData.video1;
+        
+        const result = await Swal.fire({
+            title: '🎥 ' + video.title,
+            html: `
+                <div class="text-center space-y-4">
+                    <div class="bg-gradient-to-br from-blue-400 via-purple-500 to-blue-600 h-64 rounded-xl flex items-center justify-center mb-4 relative overflow-hidden shadow-lg">
+                        <div class="text-center text-white z-10">
+                            <i class="fas fa-play-circle text-6xl mb-4 opacity-90 cursor-pointer hover:opacity-100 hover:scale-110 transition-all duration-300"></i>
+                            <h3 class="font-bold text-lg mb-2">${video.title}</h3>
+                            <p class="opacity-90 text-sm px-4">${video.description}</p>
+                        </div>
+                        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                        <div class="absolute top-4 right-4 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                            <i class="fas fa-video mr-1"></i>VIDEO
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                        <p class="text-amber-800 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Video testimonial lengkap akan dikirimkan via WhatsApp
+                        </p>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fab fa-whatsapp mr-2"></i>Minta Video via WhatsApp',
+            cancelButtonText: '<i class="fas fa-times mr-2"></i>Tutup',
+            confirmButtonColor: CONFIG.colors.success,
+            cancelButtonColor: CONFIG.colors.error,
+            width: '500px',
+            customClass: {
+                container: 'swal-high-zindex'
+            }
+        });
+        
+        if (result.isConfirmed) {
+            const message = `Assalamu'alaikum TPQ Al Hikmah,
+
+Saya ingin melihat *video testimonial lengkap* TPQ Al Hikmah.
+
+🎥 Video yang ingin saya lihat: *${video.title}*
+
+Mohon kirimkan video testimonial dan dokumentasi lainnya seperti:
+📹 Video kegiatan pembelajaran
+📸 Foto suasana belajar santri
+🏆 Video prestasi santri
+📋 Testimoni orangtua dalam bentuk video
+
+Terima kasih.
+Jazakallahu khairan 🙏
+Wassalamu'alaikum warahmatullahi wabarakatuh`;
+
+            openWhatsApp(message);
+        }
     }
     
-    // Set up global error handler
-    window.addEventListener('error', function(e) {
-        debugLog('Global error caught:', e.error);
-    });
+    /* =======================================================
+     * SOCIAL MEDIA FUNCTIONS
+     * ====================================================== */
     
-    // Set up unhandled promise rejection handler
-    window.addEventListener('unhandledrejection', function(e) {
-        debugLog('Unhandled promise rejection:', e.reason);
-    });
+    function openInstagram() {
+        window.open('https://instagram.com/tpqalhikmah', '_blank');
+    }
     
-    // Initialize CSS for expandable content
-    const style = document.createElement('style');
-    style.textContent = `
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-            opacity: 0;
-        }
-        .expandable-content.expanded {
-            max-height: 1000px;
-            opacity: 1;
-        }
-    `;
-    document.head.appendChild(style);
+    function openTikTok() {
+        window.open('https://www.tiktok.com/@tpqalhikmah', '_blank');
+    }
     
-    debugLog('All systems ready ✅');
-});
+    function openYouTube() {
+        window.open('https://youtube.com/@tpqalhikmah', '_blank');
+    }
+    
+    function openFacebook() {
+        window.open('https://facebook.com/tpqalhikmah', '_blank');
+    }
+    
+    /* =======================================================
+     * GLOBAL EXPORTS
+     * ====================================================== */
+    
+    // Make all functions globally available
+    window.whatsappContact = whatsappContact;
+    window.showRegistrationForm = showRegistrationForm;
+    window.sendRegistrationToWhatsApp = sendRegistrationToWhatsApp;
+    window.showTeacherOptions = showTeacherOptions;
+    window.handleTahfidzTeacher = handleTahfidzTeacher;
+    window.handleJilidTeacher = handleJilidTeacher;
+    window.handleSurabayaLocationInquiry = handleSurabayaLocationInquiry;
+    window.showContactOptions = showContactOptions;
+    window.toggleFAQ = toggleFAQ;
+    window.playVideo = playVideo;
+    window.openInstagram = openInstagram;
+    window.openTikTok = openTikTok;
+    window.openYouTube = openYouTube;
+    window.openFacebook = openFacebook;
+    
+    // Additional utilities
+    window.handleGeneralInquiry = handleGeneralInquiry;
+    window.handleVisitRequest = handleVisitRequest;
+    window.handlePriceInquiry = handlePriceInquiry;
+    window.handleProgramInquiry = handleProgramInquiry;
+    window.handleFacilityInquiry = handleFacilityInquiry;
+    window.handleAchievementInquiry = handleAchievementInquiry;
+    
+})();
 
 /* =======================================================
- * EXPORT FUNCTIONS (if using modules)
- * ====================================================== */
-
-// Make functions globally available
-window.whatsappContact = whatsappContact;
-window.showRegistrationForm = showRegistrationForm;
-window.sendRegistrationToWhatsApp = sendRegistrationToWhatsApp;
-window.showTeacherOptions = showTeacherOptions;
-window.handleTahfidzTeacher = handleTahfidzTeacher;
-window.handleJilidTeacher = handleJilidTeacher;
-window.toggleFAQ = toggleFAQ;
-window.playVideo = playVideo;
-window.openMaps = openMaps;
-window.openInstagram = openInstagram;
-window.openTikTok = openTikTok;
-window.openYouTube = openYouTube;
-window.openFacebook = openFacebook;
-window.scrollToSection = scrollToSection;
-window.scrollToSpecificClass = scrollToSpecificClass;
-window.scrollToPrograms = scrollToPrograms;
-window.toggleDetails = toggleDetails;
-
-/* =======================================================
- * END OF FILE
+ * END OF TPQ AL HIKMAH CONTACT SYSTEM
  * ====================================================== */

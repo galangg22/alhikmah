@@ -142,62 +142,72 @@
         </div>
     </nav>
 
-   <!-- Mobile Menu (Dipindahkan keluar dari flex container) -->
+  <!-- Mobile Menu (Fixed Version) -->
 <div id="mobile-menu" class="lg:hidden mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
-    <div class="flex justify-between items-center p-6 border-b border-gray-200">
-        <h3 class="font-bold text-primary font-amiri text-lg">Menu</h3>
+    <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
+        <h3 class="font-bold text-primary font-amiri text-lg">Menu Navigasi</h3>
         <button id="close-mobile-menu" class="text-gray-500 text-xl hover:text-gray-700 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <ul class="p-6 space-y-4">
+    <ul class="p-6 space-y-2 bg-white">
         <li>
-            <a href="#home" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-home mr-3 text-primary"></i>Beranda
+            <a href="#home" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-home text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Beranda</span>
             </a>
         </li>
         <li>
-            <a href="#about" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-info-circle mr-3 text-primary"></i>Tentang
+            <a href="#about" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-info-circle text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Tentang Kami</span>
             </a>
         </li>
         <li>
-            <a href="#classes" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-chalkboard-teacher mr-3 text-primary"></i>Kelas
+            <a href="#classes" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-chalkboard-teacher text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Pilihan Kelas</span>
             </a>
         </li>
         <li>
-            <a href="#programs" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-list-ul mr-3 text-primary"></i>Program
+            <a href="#programs" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-list-ul text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Program</span>
             </a>
         </li>
         <li>
-            <a href="#testimonial" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-quote-left mr-3 text-primary"></i>Testimoni
+            <a href="#testimonial" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-quote-left text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Testimoni</span>
             </a>
         </li>
         <li>
-            <a href="#teacher-apply" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-user-tie mr-3 text-primary"></i>Guru Pengajar
+            <a href="#teacher-apply" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-user-tie text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Guru Pengajar</span>
             </a>
         </li>
         <li>
-            <a href="#location" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-map-marker-alt mr-3 text-primary"></i>Lokasi
+            <a href="#location" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-map-marker-alt text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Lokasi TPQ</span>
             </a>
         </li>
         <li>
-            <a href="#contact" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-phone mr-3 text-primary"></i>Kontak
+            <a href="#contact" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-phone text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Kontak</span>
             </a>
         </li>
         <li>
-            <a href="#gallery" class="block py-3 px-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300">
-                <i class="fas fa-images mr-3 text-primary"></i>Galeri
+            <a href="#gallery" class="flex items-center py-3 px-3 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-all duration-300 text-base font-medium">
+                <i class="fas fa-images text-primary text-lg mr-3 min-w-[20px]"></i>
+                <span class="text-gray-800">Galeri</span>
             </a>
         </li>
     </ul>
 </div>
+
 
 
     <!-- Overlay untuk menutup menu ketika area luar diklik -->
